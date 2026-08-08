@@ -30,8 +30,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# agentic skills plugin folder
+# unused 3D GLB assets & heavy folders
+*.glb
+*.GLB
+/models/
+public/models/
+**/models/
 /skills/
+*.md
+*.MD
 
 # OS & IDE
 .DS_Store
