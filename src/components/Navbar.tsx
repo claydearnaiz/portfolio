@@ -3,12 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { navItems, personalInfo } from "@/data/personal";
 import { Button } from "@/components/ui/Button";
-import { Menu, X, ArrowUpRight, Clock, Sun, Moon, Sparkles } from "lucide-react";
-import { useTheme } from "@/context/ThemeContext";
+import { Menu, X, ArrowUpRight, Clock, Terminal } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 export const Navbar: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
   const [activeSection, setActiveSection] = useState<string>("hero");
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
@@ -82,9 +80,9 @@ export const Navbar: React.FC = () => {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-4 px-4 sm:px-8",
+        "fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-3.5 px-4 sm:px-8",
         isScrolled
-          ? "bg-black/90 backdrop-blur-xl border-b border-neutral-800 py-3 shadow-2xl"
+          ? "bg-black/95 backdrop-blur-xl border-b border-neutral-800/90 py-3 shadow-2xl"
           : "bg-transparent"
       )}
     >
@@ -92,23 +90,23 @@ export const Navbar: React.FC = () => {
         {/* Brand Logo & Live Time */}
         <a
           href="#"
-          className="flex items-center gap-3.5 group cursor-pointer text-white font-mono"
+          className="flex items-center gap-3 group cursor-pointer text-white font-mono min-h-[44px]"
         >
-          <div className="w-9 h-9 rounded-lg bg-white text-black font-black flex items-center justify-center text-sm tracking-tighter shadow-md shadow-white/20 group-hover:scale-105 group-hover:bg-neutral-100 transition-all duration-300">
+          <div className="w-9 h-9 rounded-lg bg-[#00d4ff] text-black font-black flex items-center justify-center text-sm tracking-tighter shadow-md shadow-[#00d4ff]/20 group-hover:scale-105 transition-all duration-300">
             CA
           </div>
           <div className="hidden sm:flex flex-col">
-            <span className="font-bold text-xs tracking-tight text-white group-hover:text-neutral-300 transition-colors">
+            <span className="font-bold text-xs tracking-tight text-white group-hover:text-[#00d4ff] transition-colors">
               {personalInfo.name.toUpperCase()}
             </span>
             <span className="text-[10px] text-neutral-400 font-mono flex items-center gap-1">
-              <Clock className="w-3 h-3 text-neutral-400" />
-              {timeString || "00:00:00 UTC"}
+              <Clock className="w-3 h-3 text-[#00d4ff]" />
+              {timeString || "00:00:00 UTC+8"}
             </span>
           </div>
         </a>
 
-        {/* Desktop Navigation Links */}
+        {/* Desktop Navigation Links (Restrained Outlined HUD Pill for Active State) */}
         <nav className="hidden lg:flex items-center gap-1 bg-neutral-950/90 backdrop-blur-xl border border-neutral-800/90 p-1.5 rounded-full shadow-2xl">
           {navItems.map((item, index) => {
             const sectionId = item.href.substring(1);
@@ -121,13 +119,13 @@ export const Navbar: React.FC = () => {
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item.href)}
                 className={cn(
-                  "px-4 py-1.5 text-xs font-mono tracking-wider rounded-full transition-all duration-300 cursor-pointer flex items-center gap-1.5 relative",
+                  "px-4 py-1.5 text-xs font-mono tracking-wider rounded-full transition-all duration-300 cursor-pointer flex items-center gap-1.5 relative min-h-[36px]",
                   isActive
-                    ? "bg-white text-black font-bold shadow-md shadow-white/10"
-                    : "text-neutral-400 hover:text-white hover:bg-neutral-900/90"
+                    ? "bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/40 font-bold shadow-[0_0_12px_rgba(0,212,255,0.15)]"
+                    : "text-neutral-400 hover:text-white hover:bg-neutral-900/90 border border-transparent"
                 )}
               >
-                <span className={isActive ? "text-black/60 font-semibold" : "text-neutral-500"}>
+                <span className={isActive ? "text-[#00d4ff] font-semibold" : "text-neutral-500"}>
                   {indexStr}
                 </span>
                 <span>{item.label.toUpperCase()}</span>
@@ -136,25 +134,15 @@ export const Navbar: React.FC = () => {
           })}
         </nav>
 
-        {/* Action Button & Theme Toggle */}
-        <div className="flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="p-2 rounded-full border border-neutral-800 bg-neutral-950/80 text-white hover:border-neutral-500 transition-all cursor-pointer shadow-sm"
-            aria-label="Toggle Light / Dark Mode"
-            title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
-          >
-            {theme === "dark" ? <Sun className="w-4 h-4 text-neutral-200" /> : <Moon className="w-4 h-4 text-neutral-800" />}
-          </button>
-
+        {/* Action Button & Mobile Menu */}
+        <div className="flex items-center gap-3">
           <Button
             href="/resume.pdf"
             target="_blank"
-            variant="primary"
+            variant="outline"
             size="sm"
             rightIcon={<ArrowUpRight className="w-3.5 h-3.5" />}
-            className="hidden md:inline-flex"
+            className="hidden md:inline-flex border-neutral-700 hover:border-[#00d4ff] hover:text-[#00d4ff]"
           >
             RESUME
           </Button>
@@ -163,11 +151,11 @@ export const Navbar: React.FC = () => {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-white hover:border-white focus:outline-none cursor-pointer"
+            className="lg:hidden min-w-[44px] min-h-[44px] p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-white hover:border-[#00d4ff] focus:outline-none focus:ring-1 focus:ring-[#00d4ff] cursor-pointer flex items-center justify-center"
             aria-label="Toggle Navigation Menu"
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-6 h-6 text-[#00d4ff]" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
@@ -176,8 +164,8 @@ export const Navbar: React.FC = () => {
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 top-[65px] bg-black/95 backdrop-blur-2xl z-50 p-6 flex flex-col justify-between animate-fade-in border-t border-neutral-800">
           <div className="space-y-6 pt-4">
-            <div className="text-xs font-mono tracking-widest text-neutral-500 uppercase">
-              // INDEX NAVIGATION
+            <div className="text-xs font-mono tracking-widest text-[#00d4ff] uppercase flex items-center gap-2">
+              <Terminal className="w-3.5 h-3.5" /> // INDEX NAVIGATION
             </div>
             <div className="flex flex-col gap-4">
               {navItems.map((item, index) => {
@@ -191,13 +179,13 @@ export const Navbar: React.FC = () => {
                     href={item.href}
                     onClick={(e) => handleNavClick(e, item.href)}
                     className={cn(
-                      "text-3xl sm:text-4xl font-black tracking-tight transition-all flex items-baseline gap-4 border-b border-neutral-900 pb-3 cursor-pointer",
+                      "text-2xl sm:text-3xl font-black tracking-tight transition-all flex items-baseline gap-4 border-b border-neutral-900 pb-3 cursor-pointer min-h-[44px]",
                       isActive
-                        ? "text-white translate-x-2"
-                        : "text-neutral-500 hover:text-neutral-200"
+                        ? "text-[#00d4ff] translate-x-2 font-mono"
+                        : "text-neutral-400 hover:text-white font-mono"
                     )}
                   >
-                    <span className="text-sm font-mono text-neutral-500">{indexStr}</span>
+                    <span className="text-xs font-mono text-neutral-500">{indexStr}</span>
                     <span>{item.label.toUpperCase()}</span>
                   </a>
                 );
@@ -209,14 +197,14 @@ export const Navbar: React.FC = () => {
             <Button
               href="/resume.pdf"
               target="_blank"
-              variant="primary"
+              variant="outline"
               size="lg"
               rightIcon={<ArrowUpRight className="w-4 h-4" />}
-              className="w-full justify-center"
+              className="w-full justify-center border-neutral-700 text-white hover:border-[#00d4ff] hover:text-[#00d4ff]"
             >
               DOWNLOAD RESUME
             </Button>
-            <div className="text-xs font-mono text-center text-neutral-500">
+            <div className="text-xs font-mono text-center text-neutral-400">
               LOCAL TIME: {timeString}
             </div>
           </div>

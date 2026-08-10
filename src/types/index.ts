@@ -10,16 +10,20 @@ export interface Project {
   image: string;
   github?: string;
   demo?: string;
+  isPrivateRepo?: boolean;
   featured: boolean;
 }
 
 export type SkillCategory = "Frontend" | "Backend" | "IoT & AI" | "Tools";
 
+export type ProficiencyLevel = "Proficient" | "Familiar" | "Learning";
+
 export interface Skill {
   name: string;
   category: SkillCategory;
   iconName: string;
-  level?: number | string;
+  proficiency: ProficiencyLevel;
+  level?: number;
 }
 
 export interface ExperienceItem {

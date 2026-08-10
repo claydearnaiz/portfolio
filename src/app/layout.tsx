@@ -7,6 +7,8 @@ import { CustomCursor } from "@/components/ui/CustomCursor";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { SmoothScrollProvider } from "@/components/ui/SmoothScrollProvider";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { InteractiveBackgroundMesh } from "@/components/ui/InteractiveBackgroundMesh";
+import { InteractiveTerminalModal } from "@/components/ui/InteractiveTerminalModal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -50,8 +52,6 @@ export const metadata: Metadata = {
   },
 };
 
-import { InteractiveTerminalModal } from "@/components/ui/InteractiveTerminalModal";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -59,12 +59,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark scroll-smooth`}>
-      <body className="bg-black text-neutral-100 antialiased min-h-screen selection:bg-white selection:text-black font-sans relative overflow-x-hidden">
+      <body className="bg-black text-neutral-100 antialiased min-h-screen selection:bg-emerald-500 selection:text-black font-sans relative overflow-x-hidden">
         <ThemeProvider>
           <SmoothScrollProvider>
             <a href="#main-content" className="skip-to-content">
               SKIP TO CONTENT
             </a>
+            <InteractiveBackgroundMesh />
             <ScrollProgress />
             <GrainOverlay />
             <CustomCursor />

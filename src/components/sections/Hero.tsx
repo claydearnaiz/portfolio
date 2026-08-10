@@ -1,66 +1,27 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 import { Marquee } from "@/components/ui/Marquee";
-import { ArrowDownRight, Mail, Download, Terminal } from "lucide-react";
-import { personalInfo } from "@/data/personal";
+import { ArrowDownRight, Download, Terminal, Activity, ArrowDown } from "lucide-react";
 import { TerminalStream } from "@/components/ui/TerminalStream";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
-
-const stagger = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.15,
-    },
-  },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-};
-
-const fadeIn = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { duration: 0.8, ease: "easeOut" },
-  },
-};
+import { OdometerCounter } from "@/components/ui/OdometerCounter";
 
 export const HeroSection: React.FC = () => {
-  const [gridActive, setGridActive] = useState<number[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
-  const shouldReduceMotion = useReducedMotion();
+  const [uptime, setUptime] = useState(1);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0px", "100px"]);
-  const headlineScale = useTransform(scrollYProgress, [0, 0.8], [1, 0.95]);
-  const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
+  useEffect(() => {
+    const timer = setInterval(() => setUptime((prev) => prev + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleScrollTo = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const toggleGridCell = (index: number) => {
-    if (!gridActive.includes(index)) {
-      setGridActive([...gridActive, index]);
     }
   };
 
@@ -81,120 +42,120 @@ export const HeroSection: React.FC = () => {
     <section
       ref={sectionRef}
       id="hero"
-      className="relative min-h-[90vh] flex flex-col justify-center bg-black border-b border-neutral-800 overflow-hidden py-20"
+      className="relative min-h-[92vh] flex flex-col justify-between bg-black border-b border-neutral-800/80 overflow-hidden pt-20 pb-0 z-10"
     >
-      {/* Dramatic Subtle Radial Spotlight Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-white/[0.03] rounded-full blur-[140px] pointer-events-none" />
+      {/* Background Radial Spotlight */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[450px] bg-[#00d4ff]/10 rounded-full blur-[180px] pointer-events-none" />
 
-      {/* Background Grid Pattern with Parallax */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.35 }}
-        transition={{ duration: 1.5, delay: 0.5 }}
-        style={shouldReduceMotion ? {} : { y: bgY }}
-        className="absolute inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"
-      />
-
-      <Container className="relative z-10 my-auto">
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate="visible"
-          className="max-w-6xl mx-auto space-y-10"
-        >
-          {/* Top Status & Location Header */}
-          <motion.div
-            variants={fadeUp}
-            className="flex flex-wrap items-center justify-between gap-4 border-b border-neutral-800/80 pb-6"
-          >
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-neutral-700/60 bg-neutral-950/90 backdrop-blur-xl font-mono text-xs text-neutral-200 shadow-[0_0_15px_rgba(255,255,255,0.06)]">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-              <span className="font-semibold tracking-wider">AVAILABLE FOR OPPORTUNITIES</span>
+      <Container className="relative z-10 my-auto w-full pt-4">
+        <div className="max-w-6xl mx-auto space-y-10">
+          {/* Status Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-neutral-900 pb-5">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-neutral-800 bg-neutral-950/90 font-mono text-xs text-neutral-300">
+              <span className="w-2 h-2 rounded-full bg-[#00d4ff] animate-pulse shadow-[0_0_10px_#00d4ff]" />
+              <span className="font-bold tracking-wider">AVAILABLE FOR OPPORTUNITIES</span>
             </div>
-            <div className="font-mono text-xs text-neutral-400 flex items-center gap-2 tracking-wider">
-              <Terminal className="w-3.5 h-3.5 text-white" />
-              <span>MANDALUYONG, METRO MANILA // REMOTE & ON-SITE</span>
+
+            <div className="font-mono text-xs text-neutral-400 flex items-center gap-4 tracking-wider">
+              <div className="flex items-center gap-1.5 text-[#00d4ff]">
+                <Activity className="w-3.5 h-3.5" />
+                <span className="flex items-center gap-1">
+                  UPTIME: <OdometerCounter value={uptime} suffix="s" className="inline-block text-[#00d4ff]" />
+                </span>
+              </div>
+              <div className="hidden sm:flex items-center gap-2">
+                <Terminal className="w-3.5 h-3.5 text-[#00d4ff]" />
+                <span>MANDALUYONG, METRO MANILA // REMOTE & ON-SITE</span>
+              </div>
             </div>
-          </motion.div>
-
-          {/* Oversized Editorial Statement Headline */}
-          <div className="space-y-4 pt-2">
-            <motion.h1
-              variants={fadeUp}
-              style={shouldReduceMotion ? {} : { scale: headlineScale }}
-              className="text-5xl sm:text-8xl lg:text-9xl font-black uppercase tracking-tighter leading-none origin-left text-white"
-            >
-              <span>CLAYDE</span>{" "}
-              <span className="text-stroke hover:text-white transition-colors duration-500 cursor-default">ARNAIZ</span>
-            </motion.h1>
-
-            <motion.p
-              variants={fadeUp}
-              className="text-xl sm:text-3xl lg:text-4xl font-light text-neutral-300 tracking-tight max-w-4xl leading-snug font-mono"
-            >
-              COMPUTER ENGINEER.
-            </motion.p>
           </div>
 
-          {/* Interactive Matrix Widget & Bio */}
-          <motion.div
-            variants={fadeUp}
-            className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center pt-4 border-t border-neutral-900"
-          >
-            {/* Animated CLI Terminal Widget */}
-            <div className="md:col-span-5 hidden sm:block">
+          {/* Clean Display Headline */}
+          <div className="space-y-3 pt-2">
+            <h1 className="text-4xl sm:text-7xl lg:text-[8.5rem] font-black uppercase tracking-tighter leading-none select-none break-words">
+              <span className="text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.9)]">CLAYDE</span>{" "}
+              <span className="text-stroke hover:text-white transition-all duration-500">
+                ARNAIZ
+              </span>
+            </h1>
+
+            <p className="text-xl sm:text-3xl lg:text-4xl font-black text-neutral-300 tracking-tight font-mono uppercase">
+              COMPUTER ENGINEER.
+            </p>
+          </div>
+
+          {/* Bottom Grid (Terminal + CTAs) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end pt-6 border-t border-neutral-900">
+            {/* Terminal CLI Widget */}
+            <div className="lg:col-span-5 hidden sm:block">
               <TerminalStream />
             </div>
 
-            {/* Tagline & CTAs */}
-            <div className="md:col-span-7 space-y-6">
-              <p className="text-sm sm:text-base text-neutral-300 font-mono leading-relaxed">
-                Aspiring Software Engineer & Cloud Engineer.
+            {/* Subtext & Refined CTAs */}
+            <div className="lg:col-span-7 space-y-6">
+              <p className="text-sm sm:text-base text-neutral-300 font-mono font-medium leading-relaxed">
+                Aspiring Software Engineer & Cloud Engineer specializing in Python, C++, PHP, relational databases, and IoT edge architectures.
               </p>
 
               <div className="flex flex-wrap items-center gap-4">
-                <Button
-                  onClick={() => handleScrollTo("projects")}
-                  variant="primary"
-                  size="lg"
-                  rightIcon={<ArrowDownRight className="w-4 h-4" />}
-                >
-                  EXPLORE WORK
-                </Button>
+                {/* Primary Solid CTA */}
+                <MagneticButton>
+                  <Button
+                    onClick={() => handleScrollTo("projects")}
+                    variant="primary"
+                    size="lg"
+                    rightIcon={<ArrowDownRight className="w-4 h-4" />}
+                    className="bg-[#00d4ff] text-black font-bold hover:bg-white shadow-[0_0_20px_rgba(0,212,255,0.25)] border-none"
+                  >
+                    EXPLORE WORK
+                  </Button>
+                </MagneticButton>
 
-                <Button
-                  href="/resume.pdf"
-                  target="_blank"
-                  variant="outline"
-                  size="lg"
-                  leftIcon={<Download className="w-4 h-4" />}
-                >
-                  RESUME
-                </Button>
+                {/* Secondary Outlined CTA */}
+                <MagneticButton>
+                  <Button
+                    href="/resume.pdf"
+                    target="_blank"
+                    variant="outline"
+                    size="lg"
+                    leftIcon={<Download className="w-4 h-4" />}
+                    className="border-neutral-700 hover:border-[#00d4ff] text-white hover:text-[#00d4ff]"
+                  >
+                    RESUME
+                  </Button>
+                </MagneticButton>
 
-                <Button
+                {/* Muted Tertiary Action */}
+                <button
+                  type="button"
                   onClick={() => handleScrollTo("contact")}
-                  variant="ghost"
-                  size="lg"
-                  leftIcon={<Mail className="w-4 h-4" />}
+                  className="text-xs font-mono text-neutral-400 hover:text-white underline transition-colors cursor-pointer px-2 py-2 min-h-[44px]"
                 >
-                  GET IN TOUCH
-                </Button>
+                  Direct Inquiry
+                </button>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+
+          {/* Scroll-Down Indicator */}
+          <div className="flex items-center justify-between pt-4 font-mono text-[10px] text-neutral-400 border-t border-neutral-900/60">
+            <span>SCROLL TO DISCOVER</span>
+            <button
+              type="button"
+              onClick={() => handleScrollTo("about")}
+              className="flex items-center gap-1.5 text-neutral-400 hover:text-[#00d4ff] transition-colors cursor-pointer min-h-[32px]"
+            >
+              <span>SYS_INIT</span>
+              <ArrowDown className="w-3.5 h-3.5 animate-bounce text-[#00d4ff]" />
+            </button>
+          </div>
+        </div>
       </Container>
 
-      {/* Marquee Banner */}
-      <motion.div
-        variants={fadeIn}
-        initial="hidden"
-        animate="visible"
-        className="border-y border-neutral-800 bg-neutral-950/80 py-2 mt-12"
-      >
+      {/* Marquee Footer Banner */}
+      <div className="border-y border-neutral-800/80 bg-neutral-950/90 backdrop-blur-xl py-3 mt-4">
         <Marquee items={marqueeKeywords} />
-      </motion.div>
+      </div>
     </section>
   );
 };

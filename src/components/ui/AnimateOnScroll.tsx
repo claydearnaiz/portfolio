@@ -73,7 +73,7 @@ export const AnimateOnScroll: React.FC<AnimateOnScrollProps> = ({
       transition={{
         duration,
         delay,
-        ease: [0.215, 0.61, 0.355, 1], // Cubic-bezier easeOutCubic for high-end cinematic feel
+        ease: [0.215, 0.61, 0.355, 1],
       }}
       variants={getVariants()}
       className={className}
@@ -82,4 +82,3 @@ export const AnimateOnScroll: React.FC<AnimateOnScrollProps> = ({
     </motion.div>
   );
 };
-

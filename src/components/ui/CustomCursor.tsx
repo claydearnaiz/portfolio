@@ -28,7 +28,6 @@ export const CustomCursor: React.FC = () => {
     let lastText = "";
 
     const onMouseMove = (e: MouseEvent) => {
-      // Direct motion value update - avoids React component re-rendering on mousemove
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
 
@@ -93,13 +92,13 @@ export const CustomCursor: React.FC = () => {
 
   if (isTouchDevice || shouldReduceMotion) return null;
 
-  const size = cursorText ? 48 : 32;
+  const size = cursorText ? 44 : 20;
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
-      {/* Outer Ring / Context Label Circle */}
+      {/* Outer Precision Cursor Ring */}
       <motion.div
-        className="fixed top-0 left-0 rounded-full border border-white/50 pointer-events-none mix-blend-difference flex items-center justify-center text-[9px] font-mono font-black tracking-tighter text-white uppercase"
+        className="fixed top-0 left-0 rounded-full border border-[#00d4ff]/70 pointer-events-none flex items-center justify-center text-[9px] font-mono font-black tracking-tighter text-[#00d4ff] uppercase backdrop-blur-[1px]"
         style={{
           x: cursorX,
           y: cursorY,
@@ -109,18 +108,18 @@ export const CustomCursor: React.FC = () => {
           height: size,
         }}
         animate={{
-          scale: isHovered ? (cursorText ? 1.25 : 1.75) : 1,
-          borderColor: isHovered ? "rgba(255, 255, 255, 0.95)" : "rgba(255, 255, 255, 0.4)",
-          backgroundColor: isHovered ? (cursorText ? "rgba(255, 255, 255, 0.25)" : "rgba(255, 255, 255, 0.12)") : "transparent",
+          scale: isHovered ? (cursorText ? 1.2 : 1.5) : 1,
+          borderColor: isHovered ? "rgba(0, 212, 255, 0.9)" : "rgba(0, 212, 255, 0.4)",
+          backgroundColor: isHovered ? (cursorText ? "rgba(0, 212, 255, 0.2)" : "rgba(0, 212, 255, 0.1)") : "transparent",
         }}
         transition={{ duration: 0.15, ease: "easeOut" }}
       >
         {cursorText}
       </motion.div>
 
-      {/* Inner Precision Dot */}
+      {/* Inner Center Precision Dot */}
       <motion.div
-        className="fixed top-0 left-0 w-1.5 h-1.5 rounded-full bg-white pointer-events-none mix-blend-difference"
+        className="fixed top-0 left-0 w-1.5 h-1.5 rounded-full bg-[#00d4ff] pointer-events-none shadow-[0_0_6px_#00d4ff]"
         style={{
           x: mouseX,
           y: mouseY,
@@ -135,5 +134,3 @@ export const CustomCursor: React.FC = () => {
     </div>
   );
 };
-
-

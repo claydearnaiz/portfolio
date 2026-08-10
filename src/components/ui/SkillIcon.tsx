@@ -28,6 +28,8 @@ import {
   Laptop,
   Cloud,
   Box,
+  Flame,
+  Smartphone,
 } from "lucide-react";
 
 interface SkillIconProps {
@@ -65,6 +67,8 @@ export const SkillIcon: React.FC<SkillIconProps> = ({ name, className = "w-5 h-5
     Laptop: <Laptop className={className} />,
     Cloud: <Cloud className={className} />,
     Box: <Box className={className} />,
+    Flame: <Flame className={className} />,
+    Smartphone: <Smartphone className={className} />,
   };
 
   return iconMap[name] || <Code className={className} />;

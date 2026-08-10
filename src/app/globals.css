@@ -3,30 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --background: #000000;
-  --foreground: #FAFAFA;
-  --primary: #18181B;
-  --primary-foreground: #FFFFFF;
-  --secondary: #27272A;
-  --secondary-foreground: #F8FAFC;
-  --accent: #FFFFFF;
+  --background: #050505;
+  --foreground: #fafafa;
+  --primary: #18181b;
+  --primary-foreground: #ffffff;
+  --secondary: #27272a;
+  --secondary-foreground: #f8fafc;
+  --accent: #00d4ff;
   --accent-foreground: #000000;
-  --muted: #181818;
-  --muted-foreground: #A1A1AA;
-  --border: #27272A;
-  --card-bg: rgba(18, 18, 18, 0.7);
-  --card-border: rgba(255, 255, 255, 0.12);
-}
-
-html.light {
-  color-scheme: light;
-  filter: invert(1) hue-rotate(180deg);
-}
-
-html.light img, 
-html.light video, 
-html.light [data-cursor] {
-  filter: invert(1) hue-rotate(180deg);
+  --muted: #121212;
+  --muted-foreground: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.1);
+  --card-bg: rgba(13, 13, 15, 0.75);
+  --card-border: rgba(255, 255, 255, 0.08);
 }
 
 html {
@@ -60,22 +49,23 @@ body {
   font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Custom Scrollbar */
+/* Custom Unified Terminal Cyan Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #050505;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3F3F46;
+  background: #27272a;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #FFFFFF;
+  background: #00d4ff;
 }
 
 /* Monospace font utility */
@@ -94,9 +84,60 @@ body {
   color: #ffffff;
 }
 
-/* Subtle background noise texture */
-.bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+/* Glassmorphism Panel Utility */
+.glass-panel {
+  background: rgba(12, 12, 16, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-panel-interactive {
+  background: rgba(12, 12, 16, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-interactive:hover {
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow: 0 12px 40px 0 rgba(0, 212, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Unified Terminal Accent Clip Utility */
+.accent-terminal-text {
+  color: #00d4ff;
+}
+
+/* Terminal Corner Brackets */
+.terminal-bracket-card {
+  position: relative;
+}
+
+.terminal-bracket-card::before {
+  content: "[";
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  color: #00d4ff;
+  opacity: 0.7;
+}
+
+.terminal-bracket-card::after {
+  content: "]";
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  color: #00d4ff;
+  opacity: 0.7;
 }
 
 /* Reduced Motion Compliance */
@@ -112,6 +153,10 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .animate-marquee {
+    animation: none !important;
   }
 }
 

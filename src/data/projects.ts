@@ -9,8 +9,8 @@ export const projectsData: Project[] = [
     category: "Mobile Development",
     technologies: ["React Native", "Expo", "Flutter", "Raspberry Pi", "YOLOv8n-NCNN", "Python", "Firebase", "Node.js", "Arduino", "ESP32"],
     image: "/projects/linis-app-1.png",
-    github: "https://github.com/claydearnaiz",
-    demo: "https://claydearnaiz.vercel.app",
+    demo: "https://clayde-arnaiz.vercel.app",
+    isPrivateRepo: true,
     featured: true,
   },
 ];

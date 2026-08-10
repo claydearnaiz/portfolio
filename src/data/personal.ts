@@ -14,7 +14,7 @@ export const personalInfo: PersonalInfo = {
   phone: "+63 947 741 2362",
   github: "https://github.com/claydearnaiz",
   linkedin: "https://www.linkedin.com/in/clayde-arnaiz",
-  portfolioUrl: "https://claydearnaiz.vercel.app",
+  portfolioUrl: "https://clayde-arnaiz.vercel.app",
   availableForWork: true
 };
 
