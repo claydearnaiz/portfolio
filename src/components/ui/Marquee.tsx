@@ -3,73 +3,85 @@
 import React, { useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, useGSAP);
+  gsap.registerPlugin(useGSAP);
 }
 
 interface MarqueeProps {
   items: string[];
   direction?: "left" | "right";
   className?: string;
+  speed?: number;
 }
 
 export const Marquee: React.FC<MarqueeProps> = ({
   items,
   direction = "left",
   className = "",
+  speed = 70,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const isHoveredRef = useRef(false);
+  const [, setIsHovered] = useState(false);
+  const xRef = useRef<number | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Module 25 Kinetic Marquee: Infinite 60fps loop with GSAP ScrollTrigger velocity acceleration
+  const handleMouseEnter = () => {
+    isHoveredRef.current = true;
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    isHoveredRef.current = false;
+    setIsHovered(false);
+  };
+
+  // Infinite smooth frame-rate-independent marquee loop
   useGSAP(
     () => {
-      if (shouldReduceMotion || !containerRef.current || !contentRef.current) return;
+      if (shouldReduceMotion || !containerRef.current || !trackRef.current) return;
 
-      const row = containerRef.current;
-      const content = contentRef.current;
+      const container = containerRef.current;
+      const track = trackRef.current;
       const dirMultiplier = direction === "right" ? 1 : -1;
-      const baseSpeed = 70; // Base speed in px/s
-      let scrollVelocity = 0;
       let animFrameId: number;
+      let lastTime = performance.now();
 
-      // Track scroll velocity in real-time
-      const st = ScrollTrigger.create({
-        onUpdate: (self) => {
-          scrollVelocity = Math.abs(self.getVelocity());
-        },
-      });
+      function step(now: number) {
+        if (!track || !container) return;
 
-      let contentWidth = content.offsetWidth;
-      let x = direction === "right" ? -contentWidth : 0;
-
-      function step() {
-        if (!contentWidth && content) {
-          contentWidth = content.offsetWidth;
+        const trackWidth = track.offsetWidth;
+        if (!trackWidth) {
+          lastTime = now;
+          animFrameId = requestAnimationFrame(step);
+          return;
         }
 
-        // Accelerate when user scrolls down, pause on hover
-        const currentVelocity = isHovered ? 0 : scrollVelocity;
-        const currentSpeed = (baseSpeed + currentVelocity * 0.12) / 60;
-        x += dirMultiplier * currentSpeed;
+        // Calculate actual delta time in seconds (capped at 0.1s to prevent jumps after tab blur)
+        const dt = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
 
-        if (direction === "left" && x <= -contentWidth) {
-          x += contentWidth;
-        } else if (direction === "right" && x >= 0) {
-          x -= contentWidth;
+        // Initialize xRef position on first frame if null
+        if (xRef.current === null) {
+          xRef.current = direction === "right" ? -trackWidth : 0;
         }
 
-        if (row) {
-          row.style.transform = `translate3d(${x}px, 0, 0)`;
+        // Maintain constant speed (pauses on hover), perfectly independent of monitor refresh rate
+        const currentSpeed = isHoveredRef.current ? 0 : speed;
+        xRef.current += dirMultiplier * currentSpeed * dt;
+
+        // Seamless wrap-around logic: track 1 and track 2 are visually identical
+        if (direction === "left" && xRef.current <= -trackWidth) {
+          xRef.current += trackWidth;
+        } else if (direction === "right" && xRef.current >= 0) {
+          xRef.current -= trackWidth;
         }
 
-        // Decrypt velocity back to 0 smoothly
-        scrollVelocity *= 0.95;
+        container.style.transform = `translate3d(${xRef.current}px, 0, 0)`;
+
         animFrameId = requestAnimationFrame(step);
       }
 
@@ -77,10 +89,9 @@ export const Marquee: React.FC<MarqueeProps> = ({
 
       return () => {
         cancelAnimationFrame(animFrameId);
-        st.kill();
       };
     },
-    { scope: containerRef, dependencies: [items, direction, isHovered, shouldReduceMotion] }
+    { scope: containerRef, dependencies: [items, direction, speed, shouldReduceMotion] }
   );
 
   if (shouldReduceMotion) {
@@ -96,25 +107,39 @@ export const Marquee: React.FC<MarqueeProps> = ({
     );
   }
 
-  const repeatedItems = [...items, ...items, ...items, ...items];
+  const doubleItems = [...items, ...items];
 
   return (
     <div
       tabIndex={-1}
       aria-label="Technology Stack Ticker"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className={`overflow-hidden whitespace-nowrap flex select-none ${className}`}
     >
       <div
         ref={containerRef}
-        className="flex items-center gap-8 py-2.5 will-change-transform"
+        className="flex items-center will-change-transform"
       >
-        <div ref={contentRef} className="flex items-center gap-8">
-          {repeatedItems.map((item, index) => (
+        {/* Track 1 */}
+        <div ref={trackRef} className="flex items-center gap-8 shrink-0 pr-8">
+          {doubleItems.map((item, index) => (
             <span
-              key={index}
+              key={`t1-${index}`}
               aria-hidden={index >= items.length ? "true" : undefined}
+              className="inline-flex items-center gap-8 text-xs font-mono tracking-widest uppercase text-neutral-300"
+            >
+              <span>{item}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00d4ff] inline-block shadow-[0_0_6px_#00d4ff]" />
+            </span>
+          ))}
+        </div>
+
+        {/* Track 2 (Identical duplicate for seamless infinite looping) */}
+        <div className="flex items-center gap-8 shrink-0 pr-8" aria-hidden="true">
+          {doubleItems.map((item, index) => (
+            <span
+              key={`t2-${index}`}
               className="inline-flex items-center gap-8 text-xs font-mono tracking-widest uppercase text-neutral-300"
             >
               <span>{item}</span>
@@ -126,3 +151,4 @@ export const Marquee: React.FC<MarqueeProps> = ({
     </div>
   );
 };
+

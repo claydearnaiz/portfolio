@@ -9,6 +9,19 @@ import { ArrowDownRight, Download, Terminal, Activity, ArrowDown } from "lucide-
 import { TerminalStream } from "@/components/ui/TerminalStream";
 import { OdometerCounter } from "@/components/ui/OdometerCounter";
 
+const MARQUEE_KEYWORDS = [
+  "NEXT.JS 14",
+  "TYPESCRIPT",
+  "REACT",
+  "PYTHON",
+  "C++",
+  "TAILWIND CSS",
+  "SYSTEM ARCHITECTURE",
+  "REST APIS",
+  "UI/UX SYSTEMS",
+  "DOCKER",
+];
+
 export const HeroSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [uptime, setUptime] = useState(1);
@@ -24,19 +37,6 @@ export const HeroSection: React.FC = () => {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
-
-  const marqueeKeywords = [
-    "NEXT.JS 14",
-    "TYPESCRIPT",
-    "REACT",
-    "PYTHON",
-    "C++",
-    "TAILWIND CSS",
-    "SYSTEM ARCHITECTURE",
-    "REST APIS",
-    "UI/UX SYSTEMS",
-    "DOCKER",
-  ];
 
   return (
     <section
@@ -154,7 +154,7 @@ export const HeroSection: React.FC = () => {
 
       {/* Marquee Footer Banner */}
       <div className="border-y border-neutral-800/80 bg-neutral-950/90 backdrop-blur-xl py-3 mt-4">
-        <Marquee items={marqueeKeywords} />
+        <Marquee items={MARQUEE_KEYWORDS} />
       </div>
     </section>
   );
