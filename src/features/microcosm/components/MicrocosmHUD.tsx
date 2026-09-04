@@ -145,9 +145,8 @@ export const MicrocosmHUD: React.FC<MicrocosmHUDProps> = ({ onExit }) => {
     >
       {/* ================= UNIFIED RESPONSIVE TOP BAR ================= */}
       <div className="absolute top-4 left-4 right-4 pointer-events-auto flex items-center justify-between gap-2 font-mono text-xs text-white">
-        {/* Left Status Pill */}
-        <div className="bg-[#030612]/90 border border-emerald-500/30 rounded-2xl px-3 py-2 shadow-2xl backdrop-blur-2xl flex items-center gap-2.5 min-h-[44px]">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+        {/* Simulation counters */}
+        <div className="bg-neutral-950 border border-neutral-700 px-3 py-2 flex items-center gap-2.5 min-h-[44px]">
           <div className="flex items-center gap-2 whitespace-nowrap overflow-hidden">
             <span className="font-bold text-[11px]">DAY {dayCount.toString().padStart(2, "0")}</span>
             <span className="text-neutral-500 text-[10px]">•</span>

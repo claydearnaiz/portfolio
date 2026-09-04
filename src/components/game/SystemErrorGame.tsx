@@ -12,20 +12,23 @@ import { personalInfo } from "@/data/personal";
 import { skillsData } from "@/data/skills";
 import { experienceData } from "@/data/experience";
 
+const createPlayer = (): PlayerState => ({
+  x: 780,
+  y: 1100,
+  size: 24,
+  speed: 4,
+  vx: 0,
+  vy: 0,
+  direction: "up",
+});
+
 export const SystemErrorGame: React.FC = () => {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Game Engine State
-  const [player, setPlayer] = useState<PlayerState>({
-    x: 780,
-    y: 1100,
-    size: 24,
-    speed: 4,
-    vx: 0,
-    vy: 0,
-    direction: "up",
-  });
+  // The canvas owns the per-frame player position. Keeping it in a ref avoids a
+  // React render and game-loop effect teardown on every animation frame.
+  const playerRef = useRef<PlayerState>(createPlayer());
 
   const [gameObjects, setGameObjects] = useState<GameObject[]>(initialObjects);
   const [activePanel, setActivePanel] = useState<GameObject | null>(null);
@@ -92,8 +95,13 @@ export const SystemErrorGame: React.FC = () => {
     }
 
     if (obj.type === "core") {
-      if (soundEnabled) soundEngine.playCoreComplete();
-      setStats((prev) => ({ ...prev, isComplete: true }));
+      setStats((prev) => {
+        if (prev.dataCollected < prev.totalData) {
+          return { ...prev, objective: `SYSTEM CORE LOCKED — recover all fragments (${prev.dataCollected}/${prev.totalData}).` };
+        }
+        if (soundEnabled) soundEngine.playCoreComplete();
+        return { ...prev, isComplete: true };
+      });
       return;
     }
 
@@ -113,7 +121,15 @@ export const SystemErrorGame: React.FC = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
     const loop = () => {
+      let currentPlayer = playerRef.current;
       if (!isPaused && !stats.isComplete) {
         // Calculate Movement Velocities
         let dx = 0;
@@ -129,11 +145,8 @@ export const SystemErrorGame: React.FC = () => {
           dy *= 0.7071;
         }
 
-        let newX = player.x + dx * player.speed;
-        let newY = player.y + dy * player.speed;
-
-        // Collision Check with Walls
-        const playerBox = { x: newX - player.size / 2, y: newY - player.size / 2, width: player.size, height: player.size };
+        let newX = currentPlayer.x + dx * currentPlayer.speed;
+        let newY = currentPlayer.y + dy * currentPlayer.speed;
 
         let collidedX = false;
         let collidedY = false;
@@ -142,29 +155,30 @@ export const SystemErrorGame: React.FC = () => {
           if (obj.type === "wall") {
             // AABB Collision
             if (
-              newX - player.size / 2 < obj.x + obj.width &&
-              newX + player.size / 2 > obj.x &&
-              player.y - player.size / 2 < obj.y + obj.height &&
-              player.y + player.size / 2 > obj.y
+              newX - currentPlayer.size / 2 < obj.x + obj.width &&
+              newX + currentPlayer.size / 2 > obj.x &&
+              currentPlayer.y - currentPlayer.size / 2 < obj.y + obj.height &&
+              currentPlayer.y + currentPlayer.size / 2 > obj.y
             ) {
               collidedX = true;
             }
 
             if (
-              player.x - player.size / 2 < obj.x + obj.width &&
-              player.x + player.size / 2 > obj.x &&
-              newY - player.size / 2 < obj.y + obj.height &&
-              newY + player.size / 2 > obj.y
+              currentPlayer.x - currentPlayer.size / 2 < obj.x + obj.width &&
+              currentPlayer.x + currentPlayer.size / 2 > obj.x &&
+              newY - currentPlayer.size / 2 < obj.y + obj.height &&
+              newY + currentPlayer.size / 2 > obj.y
             ) {
               collidedY = true;
             }
           }
         }
 
-        if (collidedX) newX = player.x;
-        if (collidedY) newY = player.y;
+        if (collidedX) newX = currentPlayer.x;
+        if (collidedY) newY = currentPlayer.y;
 
-        setPlayer((prev) => ({ ...prev, x: newX, y: newY }));
+        currentPlayer = { ...currentPlayer, x: newX, y: newY };
+        playerRef.current = currentPlayer;
 
         // Proximity Check for Interactions
         let closest: GameObject | null = null;
@@ -186,11 +200,11 @@ export const SystemErrorGame: React.FC = () => {
       }
 
       // Render Scene
-      ctx.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Camera Offset to Keep Player Centered
-      const cameraX = Math.max(0, Math.min(player.x - canvas.width / 2, MAP_WIDTH - canvas.width));
-      const cameraY = Math.max(0, Math.min(player.y - canvas.height / 2, MAP_HEIGHT - canvas.height));
+      const cameraX = Math.max(0, Math.min(currentPlayer.x - canvas.width / 2, MAP_WIDTH - canvas.width));
+      const cameraY = Math.max(0, Math.min(currentPlayer.y - canvas.height / 2, MAP_HEIGHT - canvas.height));
 
       ctx.save();
       ctx.translate(-cameraX, -cameraY);
@@ -261,7 +275,7 @@ export const SystemErrorGame: React.FC = () => {
       ctx.shadowColor = "#ffffff";
       ctx.shadowBlur = 12;
       ctx.beginPath();
-      ctx.arc(player.x, player.y, player.size / 2, 0, Math.PI * 2);
+      ctx.arc(currentPlayer.x, currentPlayer.y, currentPlayer.size / 2, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
 
@@ -272,11 +286,14 @@ export const SystemErrorGame: React.FC = () => {
 
     loop();
 
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [player, gameObjects, isPaused, stats.isComplete]);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", resizeCanvas);
+    };
+  }, [gameObjects, isPaused, stats.isComplete]);
 
   const restartGame = () => {
-    setPlayer({ x: 780, y: 1100, size: 24, speed: 4, vx: 0, vy: 0, direction: "up" });
+    playerRef.current = createPlayer();
     setGameObjects(initialObjects);
     setStats({
       dataCollected: 0,
@@ -290,13 +307,16 @@ export const SystemErrorGame: React.FC = () => {
     setActivePanel(null);
   };
 
+  const setTouchKey = (key: string, active: boolean) => {
+    keysPressed.current[key] = active;
+  };
+
   return (
     <div className="relative w-full h-screen bg-black text-white font-mono overflow-hidden select-none">
       {/* Top HUD Overlay */}
       <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
         <div className="space-y-1 bg-neutral-950/80 border border-neutral-800 backdrop-blur-md p-3 rounded-xl pointer-events-auto">
           <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             SYSTEM//ERROR — EXPLORATION MODE
           </div>
           <div className="text-[11px] text-neutral-400">
@@ -337,10 +357,55 @@ export const SystemErrorGame: React.FC = () => {
       {/* Main Canvas Viewport */}
       <canvas
         ref={canvasRef}
-        width={typeof window !== "undefined" ? window.innerWidth : 1280}
-        height={typeof window !== "undefined" ? window.innerHeight : 720}
         className="w-full h-full block"
+        aria-label="SYSTEM ERROR exploration game. Use the direction controls to move and interact with nearby nodes."
       />
+
+      {/* Touch controls make the exploratory route usable without a keyboard. */}
+      <div className="md:hidden absolute bottom-5 left-4 z-20 grid grid-cols-3 gap-1.5 pointer-events-auto">
+        <span />
+        <button
+          type="button"
+          aria-label="Move up"
+          onPointerDown={() => setTouchKey("arrowup", true)}
+          onPointerUp={() => setTouchKey("arrowup", false)}
+          onPointerLeave={() => setTouchKey("arrowup", false)}
+          className="h-11 w-11 rounded-lg border border-neutral-700 bg-black/80 text-sm text-white backdrop-blur"
+        >▲</button>
+        <span />
+        <button
+          type="button"
+          aria-label="Move left"
+          onPointerDown={() => setTouchKey("arrowleft", true)}
+          onPointerUp={() => setTouchKey("arrowleft", false)}
+          onPointerLeave={() => setTouchKey("arrowleft", false)}
+          className="h-11 w-11 rounded-lg border border-neutral-700 bg-black/80 text-sm text-white backdrop-blur"
+        >◀</button>
+        <button
+          type="button"
+          aria-label="Interact with nearby node"
+          disabled={!nearObject || Boolean(activePanel) || isPaused}
+          onClick={() => nearObject && handleInteract(nearObject)}
+          className="h-11 w-11 rounded-lg border border-[#00d4ff]/60 bg-[#00d4ff] text-xs font-bold text-black disabled:border-neutral-700 disabled:bg-black/80 disabled:text-neutral-600"
+        >USE</button>
+        <button
+          type="button"
+          aria-label="Move right"
+          onPointerDown={() => setTouchKey("arrowright", true)}
+          onPointerUp={() => setTouchKey("arrowright", false)}
+          onPointerLeave={() => setTouchKey("arrowright", false)}
+          className="h-11 w-11 rounded-lg border border-neutral-700 bg-black/80 text-sm text-white backdrop-blur"
+        >▶</button>
+        <span />
+        <button
+          type="button"
+          aria-label="Move down"
+          onPointerDown={() => setTouchKey("arrowdown", true)}
+          onPointerUp={() => setTouchKey("arrowdown", false)}
+          onPointerLeave={() => setTouchKey("arrowdown", false)}
+          className="h-11 w-11 rounded-lg border border-neutral-700 bg-black/80 text-sm text-white backdrop-blur"
+        >▼</button>
+      </div>
 
       {/* Proximity Interaction Prompt */}
       {nearObject && !activePanel && !isPaused && !stats.isComplete && (

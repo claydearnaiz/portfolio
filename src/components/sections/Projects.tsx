@@ -1,217 +1,122 @@
-"use client";
-
-import React, { useState } from "react";
+import React from "react";
+import Image from "next/image";
+import { ArrowUpRight, Lock } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
-import { ProjectCard } from "@/components/sections/ProjectCard";
-import { ProjectModal } from "@/components/sections/ProjectModal";
+import { Button } from "@/components/ui/Button";
 import { projectsData } from "@/data/projects";
-import { ProjectCategory, Project } from "@/types";
-import { cn } from "@/utils/cn";
-import { LayoutGrid, List, ArrowUpRight, Radio, RefreshCw } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { personalInfo } from "@/data/personal";
+
+const pipeline = [
+  ["01", "Sense", "Weight and fill sensors collect the state of six shared bins."],
+  ["02", "Interpret", "A Raspberry Pi runs YOLOv8n-NCNN for ROI-based people counting."],
+  ["03", "Synchronize", "A Python service aligns multi-source timestamps in Firebase."],
+  ["04", "Forecast", "Feature engineering feeds a Random Forest overflow estimate."],
+];
 
 export const ProjectsSection: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<ProjectCategory>("All");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [hoveredProject, setHoveredProject] = useState<Project | null>(null);
+  const project = projectsData[0];
 
-  const categories: ProjectCategory[] = [
-    "All",
-    "Mobile Development",
-    "Web Development",
-    "IoT & Embedded",
-    "Other",
-  ];
-
-  const filteredProjects =
-    selectedCategory === "All"
-      ? projectsData
-      : projectsData.filter((p) => p.category === selectedCategory);
+  if (!project) return null;
 
   return (
-    <section id="projects" className="py-24 bg-black border-t border-neutral-800/80 relative">
-      <Container>
-        <AnimateOnScroll>
-          <SectionHeading
-            eyebrow="03 // SELECTED WORKS"
-            title="FEATURED PROJECTS"
-            subtitle="Explore detailed case studies across web applications, mobile architectures, and IoT edge monitoring systems."
-          />
-        </AnimateOnScroll>
+    <section id="projects" aria-labelledby="projects-heading" className="section-light border-b border-border bg-surface">
+      <Container size="full" className="py-20 sm:py-28">
+        <div className="grid gap-8 border-b border-border pb-10 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-7">
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">03 / Selected work</p>
+            <h2 id="projects-heading" className="chapter-heading mt-5 max-w-3xl text-4xl font-semibold leading-[0.95] tracking-[-0.06em] text-foreground sm:text-7xl">
+              One system, fully explained.
+            </h2>
+          </div>
+          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground lg:col-span-4 lg:col-start-9">
+            LINIS is the main case study: a computer engineering thesis that turns a physical waste stream into a readable operational signal.
+          </p>
+        </div>
 
-        {/* Filter Bar & View Toggle */}
-        <AnimateOnScroll delay={0.1} className="sticky top-16 z-30 bg-black/90 backdrop-blur-md pt-2 pb-2 mb-10">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-neutral-900 pb-4">
-            {/* Category Filters */}
-            <div className="flex flex-wrap items-center gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setSelectedCategory(category)}
-                  className={cn(
-                    "px-4 py-2 text-xs font-mono tracking-wider rounded-lg transition-all cursor-pointer border min-h-[40px]",
-                    selectedCategory === category
-                      ? "bg-[#00d4ff] text-black border-[#00d4ff] font-bold shadow-md shadow-[#00d4ff]/20"
-                      : "bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white"
-                  )}
-                >
-                  {category.toUpperCase()}
-                </button>
-              ))}
+        <article className="grid gap-10 py-12 lg:grid-cols-12 lg:gap-8 lg:py-16">
+          <div className="self-start lg:sticky lg:top-28 lg:col-span-4">
+            <div className="flex items-center justify-between border-t border-accent pt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              <span>Thesis / 2025—26</span>
             </div>
-
-            {/* Clean 2-Way View Mode Toggle */}
-            <div className="flex items-center gap-1 bg-neutral-900 border border-neutral-800 p-1 rounded-lg">
-              <button
-                type="button"
-                onClick={() => setViewMode("grid")}
-                className={cn(
-                  "p-2 rounded text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-colors min-h-[36px]",
-                  viewMode === "grid"
-                    ? "bg-[#00d4ff] text-black font-bold"
-                    : "text-neutral-400 hover:text-white"
-                )}
-                title="Spotlight Grid View"
-              >
-                <LayoutGrid className="w-4 h-4" />
-                <span className="hidden sm:inline">GRID</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setViewMode("list")}
-                className={cn(
-                  "p-2 rounded text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-colors min-h-[36px]",
-                  viewMode === "list"
-                    ? "bg-[#00d4ff] text-black font-bold"
-                    : "text-neutral-400 hover:text-white"
-                )}
-                title="Editorial List View"
-              >
-                <List className="w-4 h-4" />
-                <span className="hidden sm:inline">LIST</span>
-              </button>
+            <p aria-hidden="true" className="mt-6 text-8xl font-light leading-none tracking-[-0.08em] text-muted-foreground">01</p>
+            <h3 className="mt-8 max-w-sm text-4xl font-semibold leading-[0.92] tracking-[-0.06em] text-foreground sm:text-5xl">
+              {project.title.replace(" – Smart Bin Monitoring System", "")}
+            </h3>
+            <p className="mt-6 max-w-sm text-base leading-relaxed text-muted-foreground">
+              {project.description}
+            </p>
+            <div className="mt-8 border-t border-border pt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Role / Systems architecture, application, edge integration</p>
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Stack / React Native · Raspberry Pi · Python · Firebase</p>
             </div>
           </div>
-        </AnimateOnScroll>
 
-        {/* Terminal Empty State when 0 items in filtered category */}
-        {filteredProjects.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="py-16 text-center border border-dashed border-neutral-800 rounded-2xl bg-neutral-950/80 p-8 space-y-4 font-mono max-w-2xl mx-auto"
-          >
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs text-[#00d4ff]">
-              <Radio className="w-4 h-4 text-[#00d4ff] animate-pulse" />
-              <span className="font-bold">SYSTEM STATUS // NO TRANSMISSIONS IN CATEGORY</span>
-            </div>
+          <div className="lg:col-span-7 lg:col-start-6">
+            <figure className="project-media">
+              <div className="flex min-h-[28rem] items-center justify-center bg-surface-strong p-5 sm:min-h-[46rem]">
+                <Image
+                  src={project.image}
+                  alt="LINIS mobile monitoring dashboard"
+                  width={159}
+                  height={346}
+                  className="h-auto max-h-[36rem] w-64 max-w-full object-contain"
+                  sizes="(max-width: 1024px) 90vw, 55vw"
+                />
+              </div>
+              <figcaption className="flex flex-wrap justify-between gap-3 border-t border-border pt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+                <span>LINIS / Monitoring overview</span>
+                <span>Mobile interface</span>
+              </figcaption>
+            </figure>
+          </div>
+        </article>
 
-            <h3 className="text-xl font-bold text-white uppercase tracking-tight font-mono pt-2">
-              [ {selectedCategory.toUpperCase()} // MORE TRANSMISSIONS INCOMING ]
+        <div className="grid gap-10 border-t border-border pt-10 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-4">
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">The engineering question</p>
+            <h3 className="mt-5 max-w-xs text-3xl font-semibold leading-[0.95] tracking-[-0.05em] text-foreground sm:text-4xl">
+              When does a shared bin become an operational problem?
             </h3>
-
-            <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-              Active engineering deployment in progress. Additional case studies for this category are being staged for transmission over the coming months.
+          </div>
+          <div className="lg:col-span-7 lg:col-start-6">
+            <p className="max-w-2xl text-lg leading-relaxed text-foreground sm:text-xl">
+              {project.problemSolved}
             </p>
 
-            <button
-              type="button"
-              onClick={() => setSelectedCategory("All")}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-[#00d4ff] hover:border-[#00d4ff] hover:text-white transition-all cursor-pointer font-bold min-h-[44px]"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>RESET FILTER (VIEW ALL PROJECTS)</span>
-            </button>
-          </motion.div>
-        )}
-
-        {/* Editorial List View */}
-        {viewMode === "list" && filteredProjects.length > 0 && (
-          <div className="divide-y divide-neutral-900 border-y border-neutral-900 relative">
-            {filteredProjects.map((project, idx) => {
-              const indexStr = idx < 9 ? `0${idx + 1}` : `${idx + 1}`;
-              const isHovered = hoveredProject?.id === project.id;
-
-              return (
-                <div
-                  key={project.id}
-                  data-cursor="CASE STUDY"
-                  onMouseEnter={() => setHoveredProject(project)}
-                  onMouseLeave={() => setHoveredProject(null)}
-                  onClick={() => setSelectedProject(project)}
-                  className="py-6 sm:py-8 group flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer transition-all duration-300 hover:px-4 hover:bg-neutral-950/80 rounded-xl relative overflow-hidden"
-                >
-                  <div className="flex items-baseline gap-4 sm:gap-6 z-10">
-                    <span className="font-mono text-xs text-[#00d4ff] font-bold">
-                      [{indexStr}]
-                    </span>
-                    <div>
-                      <h3 className="text-xl sm:text-3xl font-black text-white group-hover:text-[#00d4ff] transition-colors uppercase tracking-tight font-mono">
-                        {project.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-neutral-400 font-mono mt-1 max-w-2xl line-clamp-1">
-                        {project.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between md:justify-end gap-6 pt-2 md:pt-0 font-mono text-xs z-10">
-                    <span className="px-2.5 py-1 rounded bg-neutral-900 text-neutral-300 border border-neutral-800 uppercase">
-                      {project.category}
-                    </span>
-                    <span className="text-[#00d4ff] font-bold flex items-center gap-1 group-hover:translate-x-1.5 transition-transform duration-300">
-                      CASE STUDY <ArrowUpRight className="w-4 h-4" />
-                    </span>
-                  </div>
-
-                  {/* Background image reveal on hover */}
-                  <AnimatePresence>
-                    {isHovered && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 1.05 }}
-                        animate={{ opacity: 0.12, scale: 1 }}
-                        exit={{ opacity: 0, scale: 1.05 }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute inset-0 pointer-events-none z-0 overflow-hidden"
-                      >
-                        <img
-                          src={project.image}
-                          alt={project.title}
-                          className="w-full h-full object-cover grayscale"
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
+            <ol className="mt-10 border-y border-border">
+              {pipeline.map(([number, title, detail]) => (
+                <li key={number} className="grid gap-3 border-b border-border py-5 last:border-b-0 sm:grid-cols-[3.5rem_8rem_1fr] sm:items-start">
+                  <span className="font-mono text-xs text-accent">{number}</span>
+                  <h4 className="text-sm font-medium uppercase tracking-[0.08em] text-foreground">{title}</h4>
+                  <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{detail}</p>
+                </li>
+              ))}
+            </ol>
           </div>
-        )}
+        </div>
 
-        {/* Clean High-Impact Grid Container */}
-        {viewMode === "grid" && filteredProjects.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 max-w-4xl mx-auto">
-            {filteredProjects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onOpenModal={(p) => setSelectedProject(p)}
-              />
-            ))}
-          </div>
-        )}
+        <div className="mt-16 grid gap-10 border-t border-border pt-10 sm:grid-cols-3 sm:items-start">
+          {[
+            ["/projects/linis-app-1.png", "Monitoring overview"],
+            ["/projects/linis-app-2.png", "Bin-level status"],
+            ["/projects/linis-app-3.png", "Notification log"],
+          ].map(([src, alt], index) => (
+            <figure key={src} className={`project-media ${index === 1 ? "sm:mt-20" : index === 2 ? "sm:mt-40" : ""}`}>
+              <div className="flex h-96 items-center justify-center bg-surface-strong p-6">
+                <Image src={src} alt={alt} width={178} height={367} className="h-full w-auto object-contain" sizes="(max-width: 640px) 90vw, 30vw" />
+              </div>
+              <figcaption className="pt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">{alt}</figcaption>
+            </figure>
+          ))}
+        </div>
+
+        <div className="mt-10 flex flex-wrap items-center gap-5 border-t border-border pt-6">
+          <Button href={`mailto:${personalInfo.email}?subject=${encodeURIComponent("LINIS project walkthrough")}`} variant="primary" size="md" rightIcon={<ArrowUpRight className="h-4 w-4" />}>
+            Request a walkthrough
+          </Button>
+          <span className="inline-flex items-center gap-2 text-sm text-muted-foreground"><Lock className="h-4 w-4 text-accent" /> Private thesis code</span>
+        </div>
       </Container>
-
-      {/* Case Study Modal */}
-      <ProjectModal
-        project={selectedProject}
-        onClose={() => setSelectedProject(null)}
-      />
     </section>
   );
 };

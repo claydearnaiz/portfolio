@@ -1,268 +1,189 @@
 "use client";
 
 import React, { useState } from "react";
+import { ArrowUpRight, Check, Copy } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { personalInfo } from "@/data/personal";
-import { Mail, Phone, MapPin, Send, ArrowUpRight, Copy, Check } from "lucide-react";
+
+type CopyStatus = "idle" | "copied" | "error";
 
 export const ContactSection: React.FC = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+  const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(personalInfo.email);
+      setCopyStatus("copied");
+      window.setTimeout(() => setCopyStatus("idle"), 1800);
+    } catch {
+      setCopyStatus("error");
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    }, 1200);
-  };
+  const composeEmail = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const subject = formData.subject || "Portfolio inquiry";
+    const body = [
+      `Name: ${formData.name}`,
+      `Email: ${formData.email}`,
+      "",
+      formData.message,
+    ].join("\n");
 
-  const copyEmailToClipboard = () => {
-    navigator.clipboard.writeText(personalInfo.email);
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2000);
+    window.location.href = `mailto:${personalInfo.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   return (
-    <section id="contact" className="py-24 bg-black border-t border-neutral-800/80 relative overflow-hidden">
-      {/* Background Ambient Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#00d4ff]/5 rounded-full blur-[160px] pointer-events-none" />
+    <section
+      id="contact"
+      aria-labelledby="contact-heading"
+      className="scroll-mt-20 border-t border-border bg-muted py-20 sm:py-28"
+    >
+      <Container>
+        <div className="grid gap-14 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
+              05 / Contact
+            </p>
+            <h2
+              id="contact-heading"
+              className="chapter-heading mt-5 max-w-xl text-5xl font-semibold leading-[0.92] tracking-[-0.055em] text-foreground sm:text-7xl"
+            >
+              Let’s build something that works.
+            </h2>
+            <p className="mt-7 max-w-md text-lg leading-7 text-muted-foreground">
+              For software engineering, cloud, or connected-systems work, send a direct email or prepare a draft here.
+            </p>
 
-      <Container className="relative z-10">
-        <AnimateOnScroll>
-          <SectionHeading
-            eyebrow="05 // DIRECT COMMUNICATION"
-            title="INITIATE CONTACT"
-            subtitle="Have an opportunity, engineering project, or software query? Feel free to reach out directly."
-          />
-        </AnimateOnScroll>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
-          {/* Info Column */}
-          <AnimateOnScroll className="lg:col-span-5" direction="left">
-            <Card className="border-neutral-800/80 bg-neutral-950/80 glass-panel p-8 h-full flex flex-col justify-between space-y-8">
-              <div className="space-y-6">
-                <div className="text-xs font-mono text-[#00d4ff] font-bold">
-                  // CONTACT DIRECTORY
-                </div>
-                <h3 className="text-2xl font-bold text-white uppercase tracking-tight font-mono">
-                  LET'S BUILD TOGETHER
-                </h3>
-                <p className="text-xs sm:text-sm text-neutral-300 font-mono leading-relaxed">
-                  Available for Computer Engineering, Software Engineering, and Cloud Architecture opportunities across Metro Manila or Remote.
-                </p>
-
-                <div className="space-y-4 pt-4">
-                  {/* Copy Email Button */}
-                  <button
-                    type="button"
-                    onClick={copyEmailToClipboard}
-                    className="w-full p-4 min-h-[44px] rounded-xl bg-neutral-900/80 border border-neutral-800 text-left hover:border-[#00d4ff]/50 transition-all group flex items-center justify-between cursor-pointer"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800 text-[#00d4ff]">
-                        <Mail className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="text-[10px] font-mono text-neutral-400">EMAIL ADDRESS</div>
-                        <div className="text-xs font-mono font-bold text-white group-hover:text-[#00d4ff] transition-colors">
-                          {personalInfo.email}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-2 rounded-lg bg-neutral-950 text-neutral-400 group-hover:text-white">
-                      {copiedEmail ? <Check className="w-4 h-4 text-[#00d4ff]" /> : <Copy className="w-4 h-4" />}
-                    </div>
-                  </button>
-
-                  <div className="p-4 rounded-xl bg-neutral-900/80 border border-neutral-800 flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800 text-[#00d4ff]">
-                      <Phone className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] font-mono text-neutral-400">PHONE</div>
-                      <div className="text-xs font-mono font-bold text-white">
-                        {personalInfo.phone}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-neutral-900/80 border border-neutral-800 flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-800 text-[#00d4ff]">
-                      <MapPin className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] font-mono text-neutral-400">LOCATION</div>
-                      <div className="text-xs font-mono font-bold text-white">
-                        {personalInfo.location}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div className="mt-10 border-t border-border">
+              <div className="grid gap-2 border-b border-border py-5 sm:grid-cols-[1fr_auto] sm:items-center">
+                <a
+                  href={`mailto:${personalInfo.email}`}
+                  className="flex min-h-11 min-w-0 items-center break-all text-base text-foreground transition-colors hover:text-accent"
+                >
+                  {personalInfo.email}
+                </a>
+                <button
+                  type="button"
+                  onClick={copyEmail}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 border border-border px-4 font-mono text-xs uppercase tracking-[0.12em] text-foreground transition-colors hover:border-accent hover:text-accent"
+                >
+                  {copyStatus === "copied" ? (
+                    <Check aria-hidden="true" className="h-4 w-4" />
+                  ) : (
+                    <Copy aria-hidden="true" className="h-4 w-4" />
+                  )}
+                  {copyStatus === "copied" ? "Copied" : "Copy address"}
+                </button>
               </div>
 
-              {/* Social Channels */}
-              <div className="space-y-3 pt-6 border-t border-neutral-900">
-                <div className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest">
-                  // ONLINE PROFILES
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  <a
-                    href={personalInfo.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:border-[#00d4ff]/50 transition-all cursor-pointer flex items-center justify-between min-h-[44px]"
-                  >
-                    <span>GITHUB</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </a>
+              <p role="status" aria-live="polite" className="min-h-6 py-2 text-xs text-muted-foreground">
+                {copyStatus === "error" ? "Copy failed. Select the email address above to copy it manually." : ""}
+              </p>
 
-                  <a
-                    href={personalInfo.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:border-[#00d4ff]/50 transition-all cursor-pointer flex items-center justify-between min-h-[44px]"
-                  >
-                    <span>LINKEDIN</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
-            </Card>
-          </AnimateOnScroll>
+              <nav aria-label="Social profiles" className="mt-4 grid gap-2 sm:grid-cols-2">
+                <a
+                  href={personalInfo.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex min-h-11 items-center justify-between border-b border-border text-sm text-foreground transition-colors hover:border-accent hover:text-accent"
+                >
+                  GitHub
+                  <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+                </a>
+                <a
+                  href={personalInfo.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex min-h-11 items-center justify-between border-b border-border text-sm text-foreground transition-colors hover:border-accent hover:text-accent"
+                >
+                  LinkedIn
+                  <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+                </a>
+              </nav>
+            </div>
+          </div>
 
-          {/* Form Column */}
-          <AnimateOnScroll className="lg:col-span-7" direction="right">
-            <Card className="border-neutral-800/80 bg-neutral-950/80 glass-panel p-8">
-              {isSubmitted ? (
-                <div className="py-16 text-center space-y-4 font-mono">
-                  <div className="w-14 h-14 rounded-full bg-[#00d4ff] text-black font-bold flex items-center justify-center mx-auto text-2xl shadow-lg shadow-[#00d4ff]/30">
-                    ✓
-                  </div>
-                  <h3 className="text-2xl font-bold text-white">MESSAGE TRANSMITTED</h3>
-                  <p className="text-xs text-neutral-400 max-w-md mx-auto">
-                    Thank you for reaching out. I have received your message and will respond shortly.
-                  </p>
-                  <Button
-                    onClick={() => setIsSubmitted(false)}
-                    variant="outline"
-                    size="sm"
-                    className="mt-4 border-neutral-700 hover:border-[#00d4ff]"
-                  >
-                    SEND ANOTHER MESSAGE
-                  </Button>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-1">
-                    <div className="text-xs font-mono text-[#00d4ff] font-bold">
-                      // DIRECT MESSAGE TRANSMISSION
-                    </div>
-                    <h3 className="text-xl font-bold text-white uppercase font-mono">
-                      SEND A DIRECT INQUIRY
-                    </h3>
-                  </div>
+          <form
+            onSubmit={composeEmail}
+            aria-labelledby="email-draft-heading"
+            className="border-t border-border pt-7 lg:col-span-6 lg:col-start-7"
+          >
+            <h3
+              id="email-draft-heading"
+              className="font-mono text-xs uppercase tracking-[0.16em] text-foreground"
+            >
+              Prepare an email draft
+            </h3>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+              Submitting opens your email application with these details. This site does not send or store the form.
+            </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="name" className="text-xs font-mono text-neutral-400">
-                        YOUR NAME *
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        required
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="John Doe"
-                        className="w-full px-4 py-3 rounded-xl bg-neutral-900/90 border border-neutral-800 text-white font-mono text-xs focus:outline-none focus:border-[#00d4ff] focus:ring-1 focus:ring-[#00d4ff] transition-all placeholder:text-neutral-500 min-h-[44px]"
-                      />
-                    </div>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2">
+              <label htmlFor="contact-name" className="block font-mono text-xs text-muted-foreground">
+                Name
+                <input
+                  id="contact-name"
+                  name="name"
+                  autoComplete="name"
+                  required
+                  value={formData.name}
+                  onChange={(event) => setFormData((current) => ({ ...current, name: event.target.value }))}
+                  className="mt-2 min-h-11 w-full border-b border-border bg-transparent px-0 py-3 font-sans text-base text-foreground transition-colors focus:border-accent"
+                />
+              </label>
+              <label htmlFor="contact-email" className="block font-mono text-xs text-muted-foreground">
+                Email
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={formData.email}
+                  onChange={(event) => setFormData((current) => ({ ...current, email: event.target.value }))}
+                  className="mt-2 min-h-11 w-full border-b border-border bg-transparent px-0 py-3 font-sans text-base text-foreground transition-colors focus:border-accent"
+                />
+              </label>
+            </div>
 
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-xs font-mono text-neutral-400">
-                        YOUR EMAIL *
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="john@example.com"
-                        className="w-full px-4 py-3 rounded-xl bg-neutral-900/90 border border-neutral-800 text-white font-mono text-xs focus:outline-none focus:border-[#00d4ff] focus:ring-1 focus:ring-[#00d4ff] transition-all placeholder:text-neutral-500 min-h-[44px]"
-                      />
-                    </div>
-                  </div>
+            <label htmlFor="contact-subject" className="mt-6 block font-mono text-xs text-muted-foreground">
+              Subject
+              <input
+                id="contact-subject"
+                name="subject"
+                required
+                value={formData.subject}
+                onChange={(event) => setFormData((current) => ({ ...current, subject: event.target.value }))}
+                className="mt-2 min-h-11 w-full border-b border-border bg-transparent px-0 py-3 font-sans text-base text-foreground transition-colors focus:border-accent"
+              />
+            </label>
 
-                  <div className="space-y-2">
-                    <label htmlFor="subject" className="text-xs font-mono text-neutral-400">
-                      SUBJECT *
-                    </label>
-                    <input
-                      type="text"
-                      id="subject"
-                      name="subject"
-                      required
-                      value={formData.subject}
-                      onChange={handleChange}
-                      placeholder="Opportunity / Collaboration Inquiry"
-                      className="w-full px-4 py-3 rounded-xl bg-neutral-900/90 border border-neutral-800 text-white font-mono text-xs focus:outline-none focus:border-[#00d4ff] focus:ring-1 focus:ring-[#00d4ff] transition-all placeholder:text-neutral-500 min-h-[44px]"
-                    />
-                  </div>
+            <label htmlFor="contact-message" className="mt-6 block font-mono text-xs text-muted-foreground">
+              Message
+              <textarea
+                id="contact-message"
+                name="message"
+                required
+                rows={6}
+                value={formData.message}
+                onChange={(event) => setFormData((current) => ({ ...current, message: event.target.value }))}
+                className="mt-2 w-full resize-y border-b border-border bg-transparent px-0 py-3 font-sans text-base leading-7 text-foreground transition-colors focus:border-accent"
+              />
+            </label>
 
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="text-xs font-mono text-neutral-400">
-                      MESSAGE *
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      required
-                      rows={5}
-                      value={formData.message}
-                      onChange={handleChange}
-                      placeholder="Write your message here..."
-                      className="w-full px-4 py-3 rounded-xl bg-neutral-900/90 border border-neutral-800 text-white font-mono text-xs focus:outline-none focus:border-[#00d4ff] focus:ring-1 focus:ring-[#00d4ff] transition-all placeholder:text-neutral-500 resize-none"
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    size="lg"
-                    disabled={isSubmitting}
-                    rightIcon={<Send className="w-4 h-4" />}
-                    className="w-full justify-center bg-[#00d4ff] text-black hover:bg-white border-none font-bold shadow-[0_0_20px_rgba(0,212,255,0.25)] min-h-[44px]"
-                  >
-                    {isSubmitting ? "TRANSMITTING..." : "TRANSMIT MESSAGE"}
-                  </Button>
-                </form>
-              )}
-            </Card>
-          </AnimateOnScroll>
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              rightIcon={<ArrowUpRight aria-hidden="true" className="h-4 w-4" />}
+              className="mt-8 min-h-11 rounded-none border-accent bg-accent text-accent-foreground hover:bg-foreground hover:text-background"
+            >
+              Open email draft
+            </Button>
+          </form>
         </div>
       </Container>
     </section>

@@ -35,11 +35,10 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
       {eyebrow && (
         <div
           className={cn(
-            "inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-[#00d4ff] border border-[#00d4ff]/30 px-3.5 py-1 rounded-full bg-neutral-950/80 backdrop-blur-md shadow-[0_0_15px_rgba(0,212,255,0.1)]",
+            "text-xs uppercase tracking-widest text-muted-foreground",
             align === "center" && "mx-auto"
           )}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00d4ff] animate-pulse" />
           <ScrambleText text={eyebrow} durationMs={450} />
         </div>
       )}

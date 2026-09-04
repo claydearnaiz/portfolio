@@ -1,104 +1,81 @@
-"use client";
-
 import React from "react";
+import { ArrowUp } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { personalInfo, navItems } from "@/data/personal";
-import { ArrowUp, Github, Linkedin, Twitter } from "lucide-react";
-import { useCurrentTime } from "@/hooks/useCurrentTime";
 
 export const FooterSection: React.FC = () => {
-  const timeString = useCurrentTime(true);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const targetId = href.substring(1);
-    const element = document.getElementById(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  const socialLinks = [
+    { label: "GitHub", href: personalInfo.github },
+    { label: "LinkedIn", href: personalInfo.linkedin },
+    ...(personalInfo.twitter ? [{ label: "X / Twitter", href: personalInfo.twitter }] : []),
+  ];
 
   return (
-    <footer className="py-12 bg-black border-t border-neutral-800 text-neutral-400 font-mono text-xs overflow-hidden">
+    <footer className="border-t border-border bg-background py-10 text-muted-foreground sm:py-12">
       <Container>
-        <div className="space-y-8">
-          {/* Top Bar: Nav Links & Time/Status */}
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-neutral-900 pb-8">
-            <div className="flex flex-wrap items-center gap-6">
+        <div className="grid gap-10 border-b border-border pb-10 lg:grid-cols-12">
+          <div className="lg:col-span-5">
+            <p className="text-2xl font-semibold tracking-[-0.03em] text-foreground">
+              Clayde Nhicos Arnaiz
+            </p>
+            <p className="mt-3 max-w-sm text-sm leading-6">
+              Computer engineer building software, cloud, and connected systems from Mandaluyong City.
+            </p>
+            <a
+              href={`mailto:${personalInfo.email}`}
+              className="mt-5 inline-flex min-h-11 items-center border-b border-accent text-sm text-foreground transition-colors hover:text-accent"
+            >
+              {personalInfo.email}
+            </a>
+          </div>
+
+          <nav aria-label="Footer navigation" className="lg:col-span-3 lg:col-start-7">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-accent">Index</p>
+            <ul className="mt-3 grid grid-cols-2 gap-x-4">
               {navItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href)}
-                  className="hover:text-[#00d4ff] transition-colors uppercase tracking-wider cursor-pointer font-bold"
-                >
-                  {item.label}
-                </a>
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className="flex min-h-11 items-center border-b border-border text-sm text-foreground transition-colors hover:border-accent hover:text-accent"
+                  >
+                    {item.label}
+                  </a>
+                </li>
               ))}
-            </div>
+            </ul>
+          </nav>
 
-            <div className="flex items-center gap-4 text-neutral-400 text-[11px] shrink-0">
-              <div>
-                LOCAL TIME: <span className="text-white font-bold">{timeString} UTC+8</span>
-              </div>
-              <div className="hidden sm:block">
-                SYS STATUS: <span className="text-[#00d4ff] font-bold">OPERATIONAL</span>
-              </div>
+          <nav aria-label="Social profiles" className="lg:col-span-3 lg:col-start-10">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-accent">Elsewhere</p>
+            <ul className="mt-3">
+              {socialLinks.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-h-11 items-center border-b border-border text-sm text-foreground transition-colors hover:border-accent hover:text-accent"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
 
-              <button
-                type="button"
-                onClick={scrollToTop}
-                className="p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-[#00d4ff] hover:text-white hover:border-[#00d4ff] transition-all cursor-pointer flex items-center gap-1.5 font-bold min-h-[36px]"
-                title="Scroll back to top"
-              >
-                <span>TOP</span>
-                <ArrowUp className="w-3.5 h-3.5" />
-              </button>
-            </div>
+        <div className="grid gap-4 pt-6 font-mono text-[10px] uppercase tracking-[0.12em] sm:grid-cols-[1fr_auto] sm:items-center">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <span>© {new Date().getFullYear()} Clayde Arnaiz</span>
+            <span>{personalInfo.location} · UTC+8</span>
           </div>
-
-          {/* Social Links & Copyright */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-2 text-[11px] text-neutral-500">
-            <div className="flex items-center gap-3">
-              <a
-                href={personalInfo.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 bg-neutral-950 rounded-lg hover:bg-neutral-900 text-neutral-400 hover:text-[#00d4ff] border border-neutral-800 hover:border-[#00d4ff]/40 transition-colors min-w-[38px] min-h-[38px] flex items-center justify-center"
-                title="GitHub"
-              >
-                <Github className="w-4 h-4" />
-              </a>
-              <a
-                href={personalInfo.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 bg-neutral-950 rounded-lg hover:bg-neutral-900 text-neutral-400 hover:text-[#00d4ff] border border-neutral-800 hover:border-[#00d4ff]/40 transition-colors min-w-[38px] min-h-[38px] flex items-center justify-center"
-                title="LinkedIn"
-              >
-                <Linkedin className="w-4 h-4" />
-              </a>
-              {personalInfo.twitter && (
-                <a
-                  href={personalInfo.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2.5 bg-neutral-950 rounded-lg hover:bg-neutral-900 text-neutral-400 hover:text-[#00d4ff] border border-neutral-800 hover:border-[#00d4ff]/40 transition-colors min-w-[38px] min-h-[38px] flex items-center justify-center"
-                  title="Twitter / X"
-                >
-                  <Twitter className="w-4 h-4" />
-                </a>
-              )}
-            </div>
-
-            <div className="text-center sm:text-right font-mono">
-              © {new Date().getFullYear()} Clayde Arnaiz. Computer Engineering Portfolio.
-            </div>
-          </div>
+          <a
+            href="#hero"
+            className="inline-flex min-h-11 items-center gap-2 justify-self-start text-foreground transition-colors hover:text-accent sm:justify-self-end"
+          >
+            Back to top
+            <ArrowUp aria-hidden="true" className="h-4 w-4" />
+          </a>
         </div>
       </Container>
     </footer>

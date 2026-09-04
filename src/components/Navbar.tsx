@@ -1,213 +1,192 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { navItems, personalInfo } from "@/data/personal";
 import { Button } from "@/components/ui/Button";
-import { Menu, X, ArrowUpRight, Clock, Terminal } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 export const Navbar: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<string>("hero");
-  const [isScrolled, setIsScrolled] = useState<boolean>(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const [timeString, setTimeString] = useState<string>("");
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTimeString(
-        now.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-        }) + " UTC+8"
-      );
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const [activeSection, setActiveSection] = useState("hero");
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
+      setIsScrolled(window.scrollY > 24);
 
-      const sections = navItems.map((item) => item.href.substring(1));
-      const scrollPosition = window.scrollY + 250;
+      const scrollPosition = window.scrollY + 180;
+      let currentSection = "hero";
 
-      for (const sectionId of sections) {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const top = element.offsetTop;
-          const height = element.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(sectionId);
-            break;
-          }
+      for (const item of navItems) {
+        const section = document.getElementById(item.href.slice(1));
+        if (section && scrollPosition >= section.offsetTop) {
+          currentSection = item.href.slice(1);
         }
+      }
+
+      setActiveSection(currentSection);
+    };
+
+    let frame = 0;
+    const scheduleScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        handleScroll();
+      });
+    };
+    window.addEventListener("scroll", scheduleScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener("scroll", scheduleScroll);
+      window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const focusTimer = window.setTimeout(() => {
+      mobileMenuRef.current?.querySelector<HTMLElement>("a, button")?.focus();
+    }, 0);
+
+    const handleMenuKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setMobileMenuOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab" || !mobileMenuRef.current) return;
+      const focusable = Array.from(mobileMenuRef.current.querySelectorAll<HTMLElement>("a, button"));
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleMenuKeyDown);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    setMobileMenuOpen(false);
-    const targetId = href.substring(1);
-    const element = document.getElementById(targetId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
     return () => {
-      document.body.style.overflow = "unset";
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", handleMenuKeyDown);
+      document.body.style.overflow = "";
+      if (previouslyFocused && document.body.contains(previouslyFocused)) {
+        previouslyFocused.focus();
+      } else {
+        menuButtonRef.current?.focus();
+      }
     };
   }, [mobileMenuOpen]);
+
+  const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    setMobileMenuOpen(false);
+    document.getElementById(href.slice(1))?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  };
 
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 transition-all duration-300 py-3.5 px-4 sm:px-8",
-        isScrolled
-          ? "bg-black/95 backdrop-blur-xl border-b border-neutral-800/90 py-3 shadow-2xl"
-          : "bg-transparent"
+        "fixed inset-x-0 top-0 z-40 border-b transition-colors duration-200",
+        isScrolled ? "border-border bg-background" : "border-transparent bg-background"
       )}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Brand Logo & Live Time */}
-        <a
-          href="#"
-          className="flex items-center gap-3 group cursor-pointer text-white font-mono min-h-[44px]"
-        >
-          <div className="w-9 h-9 rounded-lg bg-[#00d4ff] text-black font-black flex items-center justify-center text-sm tracking-tighter shadow-md shadow-[#00d4ff]/20 group-hover:scale-105 transition-all duration-300">
+      <div className="mx-auto flex min-h-[72px] w-full max-w-7xl items-center justify-between gap-6 px-5 sm:px-8 lg:px-10">
+        <a href="#hero" onClick={(event) => handleNavClick(event, "#hero")} className="group flex min-h-[44px] items-center gap-3">
+          <span className="flex h-9 w-9 items-center justify-center bg-accent text-sm font-bold tracking-[-0.08em] text-accent-foreground">
             CA
-          </div>
-          <div className="hidden sm:flex flex-col">
-            <span className="font-bold text-xs tracking-tight text-white group-hover:text-[#00d4ff] transition-colors">
-              {personalInfo.name.toUpperCase()}
-            </span>
-            <span className="text-[10px] text-neutral-400 font-mono flex items-center gap-1">
-              <Clock className="w-3 h-3 text-[#00d4ff]" />
-              {timeString || "00:00:00 UTC+8"}
-            </span>
-          </div>
+          </span>
+          <span className="hidden text-xs font-medium tracking-[0.08em] text-foreground sm:block">
+            CLAYDE ARNAIZ
+          </span>
+          <span className="hidden text-xs text-muted-foreground lg:block">/ {personalInfo.location}</span>
         </a>
 
-        {/* Desktop Navigation Links (Restrained Outlined HUD Pill for Active State) */}
-        <nav className="hidden lg:flex items-center gap-1 bg-neutral-950/90 backdrop-blur-xl border border-neutral-800/90 p-1.5 rounded-full shadow-2xl">
+        <nav aria-label="Primary navigation" className="hidden items-center gap-6 lg:flex">
           {navItems.map((item, index) => {
-            const sectionId = item.href.substring(1);
+            const sectionId = item.href.slice(1);
             const isActive = activeSection === sectionId;
-            const indexStr = `0${index + 1}`;
 
             return (
               <a
                 key={item.label}
                 href={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
+                onClick={(event) => handleNavClick(event, item.href)}
                 className={cn(
-                  "px-4 py-1.5 text-xs font-mono tracking-wider rounded-full transition-all duration-300 cursor-pointer flex items-center gap-1.5 relative min-h-[36px]",
-                  isActive
-                    ? "bg-[#00d4ff]/10 text-[#00d4ff] border border-[#00d4ff]/40 font-bold shadow-[0_0_12px_rgba(0,212,255,0.15)]"
-                    : "text-neutral-400 hover:text-white hover:bg-neutral-900/90 border border-transparent"
+                  "relative flex min-h-[44px] items-center gap-2 text-xs transition-colors duration-200",
+                  isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <span className={isActive ? "text-[#00d4ff] font-semibold" : "text-neutral-500"}>
-                  {indexStr}
-                </span>
-                <span>{item.label.toUpperCase()}</span>
+                <span className="font-mono text-[10px] text-accent">0{index + 1}</span>
+                <span>{item.label}</span>
+                <span className={cn("absolute inset-x-0 bottom-1 h-px origin-left bg-accent transition-transform duration-200", isActive ? "scale-x-100" : "scale-x-0")} />
               </a>
             );
           })}
         </nav>
 
-        {/* Action Button & Mobile Menu */}
         <div className="flex items-center gap-3">
           <Button
-            href="/resume.pdf"
-            target="_blank"
+            href={`mailto:${personalInfo.email}?subject=${encodeURIComponent("Résumé request")}`}
             variant="outline"
             size="sm"
-            rightIcon={<ArrowUpRight className="w-3.5 h-3.5" />}
-            className="hidden md:inline-flex border-neutral-700 hover:border-[#00d4ff] hover:text-[#00d4ff]"
+            rightIcon={<ArrowUpRight className="h-3.5 w-3.5" />}
+            className="hidden sm:inline-flex"
           >
-            RESUME
+            Request résumé
           </Button>
-
-          {/* Mobile Menu Button */}
           <button
+            ref={menuButtonRef}
             type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden min-w-[44px] min-h-[44px] p-2.5 rounded-lg bg-neutral-900 border border-neutral-800 text-white hover:border-[#00d4ff] focus:outline-none focus:ring-1 focus:ring-[#00d4ff] cursor-pointer flex items-center justify-center"
-            aria-label="Toggle Navigation Menu"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-border text-foreground transition-colors hover:border-accent hover:text-accent lg:hidden"
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6 text-[#00d4ff]" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Navigation Fullscreen Overlay */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[65px] bg-black/95 backdrop-blur-2xl z-50 p-6 flex flex-col justify-between animate-fade-in border-t border-neutral-800">
-          <div className="space-y-6 pt-4">
-            <div className="text-xs font-mono tracking-widest text-[#00d4ff] uppercase flex items-center gap-2">
-              <Terminal className="w-3.5 h-3.5" /> // INDEX NAVIGATION
-            </div>
-            <div className="flex flex-col gap-4">
-              {navItems.map((item, index) => {
-                const sectionId = item.href.substring(1);
-                const isActive = activeSection === sectionId;
-                const indexStr = `0${index + 1}`;
+        <div ref={mobileMenuRef} className="border-t border-border bg-background px-5 pb-8 pt-5 sm:px-8 lg:hidden">
+          <nav aria-label="Mobile navigation" className="flex flex-col">
+            {navItems.map((item, index) => {
+              const sectionId = item.href.slice(1);
+              const isActive = activeSection === sectionId;
 
-                return (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    onClick={(e) => handleNavClick(e, item.href)}
-                    className={cn(
-                      "text-2xl sm:text-3xl font-black tracking-tight transition-all flex items-baseline gap-4 border-b border-neutral-900 pb-3 cursor-pointer min-h-[44px]",
-                      isActive
-                        ? "text-[#00d4ff] translate-x-2 font-mono"
-                        : "text-neutral-400 hover:text-white font-mono"
-                    )}
-                  >
-                    <span className="text-xs font-mono text-neutral-500">{indexStr}</span>
-                    <span>{item.label.toUpperCase()}</span>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="space-y-4 pt-6 border-t border-neutral-900">
-            <Button
-              href="/resume.pdf"
-              target="_blank"
-              variant="outline"
-              size="lg"
-              rightIcon={<ArrowUpRight className="w-4 h-4" />}
-              className="w-full justify-center border-neutral-700 text-white hover:border-[#00d4ff] hover:text-[#00d4ff]"
-            >
-              DOWNLOAD RESUME
-            </Button>
-            <div className="text-xs font-mono text-center text-neutral-400">
-              LOCAL TIME: {timeString}
-            </div>
-          </div>
+              return (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={(event) => handleNavClick(event, item.href)}
+                  className={cn(
+                    "flex min-h-[52px] items-center gap-4 border-b border-border text-2xl transition-colors",
+                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <span className="font-mono text-xs text-accent">0{index + 1}</span>
+                  <span>{item.label}</span>
+                </a>
+              );
+            })}
+          </nav>
+          <Button href={`mailto:${personalInfo.email}?subject=${encodeURIComponent("Résumé request")}`} variant="outline" size="md" rightIcon={<ArrowUpRight className="h-4 w-4" />} className="mt-6 w-full">
+            Request résumé
+          </Button>
         </div>
       )}
     </header>

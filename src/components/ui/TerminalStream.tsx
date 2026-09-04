@@ -6,7 +6,6 @@ import { Terminal, RotateCcw } from "lucide-react";
 const commandSnippets = [
   { prompt: "$ git push origin main", output: "Enumerating objects: 12, done. Branch 'main' set up to track remote." },
   { prompt: "$ python main.py", output: "Loading YOLOv8n-NCNN model... ROI Person Counting active: 14 Diners detected." },
-  { prompt: "$ sudo systemctl status cloud-service", output: "● cloud-service.service - Active: running (online) since Mon 2026-08-07" },
   { prompt: "$ SELECT * FROM canteen_bins WHERE fill_level > 80;", output: "3 rows returned [ST1, ST2, FRC2] - Status: CRITICAL OVERFLOW RISK" },
   { prompt: "$ npm run dev", output: "▲ Next.js 14.2.35 - Local: http://localhost:3000 (Compiled in 1.4s)" },
   { prompt: "$ g++ -O3 main.cpp -o app && ./app", output: "Memory allocated: 1024KB. Microcontroller sensor telemetry stream connected." },

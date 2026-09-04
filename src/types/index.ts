@@ -53,5 +53,4 @@ export interface PersonalInfo {
   linkedin: string;
   twitter?: string;
   portfolioUrl?: string;
-  availableForWork: boolean;
 }
