@@ -2,21 +2,19 @@ import { ExperienceItem } from "@/types";
 
 export const experienceData: ExperienceItem[] = [
   {
-    id: "atticus-ojt",
+    id: "atticus-intern",
     type: "work",
-    title: "OJT / Intern",
+    title: "IT Intern",
     organization: "Atticus Advisory Solutions Inc.",
-    period: "June 2025",
-    description: "Managed inventory tasks ensuring accurate tracking and organization of company assets. Utilized Freshservice to handle IT service management efficiently, monitoring ticket statuses and asset workflows. Leveraged Monday.com for task coordination, enhancing team productivity. Assisted in automating contract processes and supported administrative and technical functions.",
-    technologies: ["Inventory Management", "Freshservice (ITSM)", "Monday.com", "Workflow Automation", "Technical Documentation", "Asset Tracking"],
+    period: "June–August 2025",
+    description: "Supported enterprise IT operations, device deployment, and end-user support. Managed IT assets through configuration, deployment, maintenance, onboarding, offboarding, and recovery. Used Freshservice and Monday.com to coordinate assets, requests, and workflows, and resolved basic hardware and software issues.",
   },
   {
     id: "adamson-education",
     type: "education",
-    title: "Bachelor of Science, Computer Engineering",
+    title: "Bachelor of Science in Computer Engineering",
     organization: "Adamson University",
-    period: "2022 – 2026",
-    description: "Specialized in Computer Engineering, embedded IoT systems, machine learning (YOLOv8n / Random Forest), full-stack web architectures, and mobile application development.",
-    technologies: ["Computer Engineering", "IoT & Embedded Systems", "Full-Stack Development", "Computer Vision", "Software Systems"],
+    period: "2022–2026",
+    description: "",
   },
 ];

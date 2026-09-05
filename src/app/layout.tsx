@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { personalInfo } from "@/data/personal";
-import { ScrollProgress } from "@/components/ui/ScrollProgress";
-import { SmoothScrollProvider } from "@/components/ui/SmoothScrollProvider";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,11 +10,6 @@ const inter = Inter({
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: `${personalInfo.name} — Computer Engineer`,
@@ -53,15 +47,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark scroll-smooth`}>
+    <html lang="en" className={`${inter.variable} dark`} suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('portfolio-theme');if(t==='light'||t==='dark'){document.documentElement.classList.toggle('light',t==='light');document.documentElement.classList.toggle('dark',t==='dark')}}catch(e){}` }} /></head>
       <body className="min-h-screen overflow-x-hidden bg-background font-sans text-foreground antialiased selection:bg-accent selection:text-accent-foreground">
-        <SmoothScrollProvider>
           <a href="#main-content" className="skip-to-content">
-            SKIP TO CONTENT
+            Skip to content
           </a>
-          <ScrollProgress />
-          {children}
-        </SmoothScrollProvider>
+          <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

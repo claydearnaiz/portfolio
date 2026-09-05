@@ -1,194 +1,85 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Menu, X } from "lucide-react";
-import { navItems, personalInfo } from "@/data/personal";
-import { Button } from "@/components/ui/Button";
-import { cn } from "@/utils/cn";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
+import { navItems } from "@/data/personal";
+import { useTheme } from "@/context/ThemeContext";
 
-export const Navbar: React.FC = () => {
-  const [activeSection, setActiveSection] = useState("hero");
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
+export function Navbar() {
+  const [active, setActive] = useState("");
+  const [open, setOpen] = useState(false);
+  const toggle = useRef<HTMLButtonElement>(null);
+  const themeToggle = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 24);
-
-      const scrollPosition = window.scrollY + 180;
-      let currentSection = "hero";
-
-      for (const item of navItems) {
-        const section = document.getElementById(item.href.slice(1));
-        if (section && scrollPosition >= section.offsetTop) {
-          currentSection = item.href.slice(1);
-        }
-      }
-
-      setActiveSection(currentSection);
-    };
-
     let frame = 0;
-    const scheduleScroll = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        handleScroll();
+    const update = () => {
+      frame = 0;
+      let next = "";
+      navItems.forEach(item => {
+        const section = document.getElementById(item.href.slice(1));
+        if (section && section.getBoundingClientRect().top <= 160) next = item.href;
       });
+      setActive(next);
     };
-    window.addEventListener("scroll", scheduleScroll, { passive: true });
-    handleScroll();
-    return () => {
-      window.removeEventListener("scroll", scheduleScroll);
-      window.cancelAnimationFrame(frame);
-    };
+    const scroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    window.addEventListener("scroll", scroll, { passive: true });
+    update();
+    return () => { window.removeEventListener("scroll", scroll); cancelAnimationFrame(frame); };
   }, []);
 
   useEffect(() => {
-    if (!mobileMenuOpen) return;
-
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    const focusTimer = window.setTimeout(() => {
-      mobileMenuRef.current?.querySelector<HTMLElement>("a, button")?.focus();
-    }, 0);
-
-    const handleMenuKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        setMobileMenuOpen(false);
-        return;
-      }
-
-      if (event.key !== "Tab" || !mobileMenuRef.current) return;
-      const focusable = Array.from(mobileMenuRef.current.querySelectorAll<HTMLElement>("a, button"));
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleMenuKeyDown);
-
-    return () => {
-      window.clearTimeout(focusTimer);
-      window.removeEventListener("keydown", handleMenuKeyDown);
-      document.body.style.overflow = "";
-      if (previouslyFocused && document.body.contains(previouslyFocused)) {
-        previouslyFocused.focus();
-      } else {
-        menuButtonRef.current?.focus();
-      }
+    menu.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setOpen(false); toggle.current?.focus(); }
+      if (event.key !== "Tab") return;
+      const links = Array.from(menu.current?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
+      const first = themeToggle.current;
+      const last = links[links.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     };
-  }, [mobileMenuOpen]);
+    const onResize = () => { if (window.innerWidth >= 900) setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [open]);
 
-  const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  function followAnchor(event: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (!open) return;
     event.preventDefault();
-    setMobileMenuOpen(false);
-    document.getElementById(href.slice(1))?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
-  };
+    setOpen(false);
+    requestAnimationFrame(() => {
+      const target = document.getElementById(href.slice(1));
+      if (!target) return;
+      history.pushState(null, "", href);
+      target.setAttribute("tabindex", "-1");
+      target.focus({ preventScroll: true });
+      target.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    });
+  }
 
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-40 border-b transition-colors duration-200",
-        isScrolled ? "border-border bg-background" : "border-transparent bg-background"
-      )}
-    >
-      <div className="mx-auto flex min-h-[72px] w-full max-w-7xl items-center justify-between gap-6 px-5 sm:px-8 lg:px-10">
-        <a href="#hero" onClick={(event) => handleNavClick(event, "#hero")} className="group flex min-h-[44px] items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center bg-accent text-sm font-bold tracking-[-0.08em] text-accent-foreground">
-            CA
-          </span>
-          <span className="hidden text-xs font-medium tracking-[0.08em] text-foreground sm:block">
-            CLAYDE ARNAIZ
-          </span>
-          <span className="hidden text-xs text-muted-foreground lg:block">/ {personalInfo.location}</span>
-        </a>
-
-        <nav aria-label="Primary navigation" className="hidden items-center gap-6 lg:flex">
-          {navItems.map((item, index) => {
-            const sectionId = item.href.slice(1);
-            const isActive = activeSection === sectionId;
-
-            return (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={(event) => handleNavClick(event, item.href)}
-                className={cn(
-                  "relative flex min-h-[44px] items-center gap-2 text-xs transition-colors duration-200",
-                  isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <span className="font-mono text-[10px] text-accent">0{index + 1}</span>
-                <span>{item.label}</span>
-                <span className={cn("absolute inset-x-0 bottom-1 h-px origin-left bg-accent transition-transform duration-200", isActive ? "scale-x-100" : "scale-x-0")} />
-              </a>
-            );
-          })}
+    <header className="site-nav">
+      <div className="nav-inner">
+        <a className="wordmark" href="#hero" onClick={event => followAnchor(event, "#hero")}>Clayde Arnaiz</a>
+        <nav className="desktop-nav" aria-label="Primary navigation">
+          {navItems.map(item => <a key={item.href} href={item.href} aria-current={active === item.href ? "location" : undefined}>{item.label}</a>)}
         </nav>
-
-        <div className="flex items-center gap-3">
-          <Button
-            href={`mailto:${personalInfo.email}?subject=${encodeURIComponent("Résumé request")}`}
-            variant="outline"
-            size="sm"
-            rightIcon={<ArrowUpRight className="h-3.5 w-3.5" />}
-            className="hidden sm:inline-flex"
-          >
-            Request résumé
-          </Button>
-          <button
-            ref={menuButtonRef}
-            type="button"
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-border text-foreground transition-colors hover:border-accent hover:text-accent lg:hidden"
-            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
+        <a className="nav-resume" href="/resume.pdf" target="_blank" rel="noopener noreferrer">Résumé <ArrowUpRight aria-hidden="true" size={16} /></a>
+        <button ref={themeToggle} className="theme-toggle" type="button" onClick={toggleTheme} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>{theme === "dark" ? <Sun aria-hidden="true" size={17} /> : <Moon aria-hidden="true" size={17} />}<span>{theme === "dark" ? "Light" : "Dark"}</span></button>
+        <button ref={toggle} className="menu-toggle" type="button" onClick={() => setOpen(value => !value)} aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="mobile-navigation">{open ? <X aria-hidden="true" size={22} /> : <Menu aria-hidden="true" size={22} />}</button>
       </div>
-
-      {mobileMenuOpen && (
-        <div ref={mobileMenuRef} className="border-t border-border bg-background px-5 pb-8 pt-5 sm:px-8 lg:hidden">
-          <nav aria-label="Mobile navigation" className="flex flex-col">
-            {navItems.map((item, index) => {
-              const sectionId = item.href.slice(1);
-              const isActive = activeSection === sectionId;
-
-              return (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  onClick={(event) => handleNavClick(event, item.href)}
-                  className={cn(
-                    "flex min-h-[52px] items-center gap-4 border-b border-border text-2xl transition-colors",
-                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <span className="font-mono text-xs text-accent">0{index + 1}</span>
-                  <span>{item.label}</span>
-                </a>
-              );
-            })}
-          </nav>
-          <Button href={`mailto:${personalInfo.email}?subject=${encodeURIComponent("Résumé request")}`} variant="outline" size="md" rightIcon={<ArrowUpRight className="h-4 w-4" />} className="mt-6 w-full">
-            Request résumé
-          </Button>
-        </div>
-      )}
+      {open && <div ref={menu} className="mobile-nav" id="mobile-navigation"><nav aria-label="Mobile navigation">{navItems.map(item => <a key={item.href} href={item.href} onClick={event => followAnchor(event, item.href)}>{item.label}</a>)}<a href="/resume.pdf" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>Résumé ↗</a></nav></div>}
     </header>
   );
-};
+}

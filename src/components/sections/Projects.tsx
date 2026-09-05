@@ -1,122 +1,114 @@
-import React from "react";
-import Image from "next/image";
-import { ArrowUpRight, Lock } from "lucide-react";
-import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { projectsData } from "@/data/projects";
+import { InspectableImage as Image } from "@/components/ui/InspectableImage";
+import { LinisSystem } from "@/components/sections/LinisSystem";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { linisLayers, projectsData } from "@/data/projects";
 import { personalInfo } from "@/data/personal";
 
-const pipeline = [
-  ["01", "Sense", "Weight and fill sensors collect the state of six shared bins."],
-  ["02", "Interpret", "A Raspberry Pi runs YOLOv8n-NCNN for ROI-based people counting."],
-  ["03", "Synchronize", "A Python service aligns multi-source timestamps in Firebase."],
-  ["04", "Forecast", "Feature engineering feeds a Random Forest overflow estimate."],
+const ayosScreens = [
+  { file: "overview", title: "Home", detail: "Your day at a glance", width: 1012, height: 664 },
+  { file: "focus", title: "Focus", detail: "Space for the task at hand", width: 1013, height: 664 },
+  { file: "calendar", title: "Calendar", detail: "A view of the week ahead", width: 1012, height: 667 },
+  { file: "notes", title: "Notes", detail: "A place to capture ideas", width: 1017, height: 661 },
+  { file: "welcome", title: "Welcome", detail: "The start of a local session", width: 1006, height: 656 },
 ];
 
-export const ProjectsSection: React.FC = () => {
-  const project = projectsData[0];
+function ProjectMeta({ index }: { index: number }) {
+  const project = projectsData[index];
+  return <div className="project-meta"><span>{project.kind}</span><span>{project.year}</span></div>;
+}
 
-  if (!project) return null;
-
+export function ProjectsSection() {
+  const [ayos, linis, attendance] = projectsData;
   return (
-    <section id="projects" aria-labelledby="projects-heading" className="section-light border-b border-border bg-surface">
-      <Container size="full" className="py-20 sm:py-28">
-        <div className="grid gap-8 border-b border-border pb-10 lg:grid-cols-12 lg:items-end">
-          <div className="lg:col-span-7">
-            <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">03 / Selected work</p>
-            <h2 id="projects-heading" className="chapter-heading mt-5 max-w-3xl text-4xl font-semibold leading-[0.95] tracking-[-0.06em] text-foreground sm:text-7xl">
-              One system, fully explained.
-            </h2>
+    <section id="projects" className="work-section" aria-labelledby="projects-heading">
+      <div className="work-intro page-width">
+        <div className="work-rule" />
+        <h2 id="projects-heading" className="work-title">Selected<br />work.</h2>
+        <p className="work-intro-copy">Three projects.<br />Different layers of the same practice.</p>
+        <nav className="project-index" aria-label="Project index">
+          <a href="#ayos"><span>01</span><strong>AyOS</strong><span>Desktop application</span><ArrowDownRight aria-hidden="true" size={20} /></a>
+          <a href="#linis"><span>02</span><strong>LINIS</strong><span>Connected systems</span><ArrowDownRight aria-hidden="true" size={20} /></a>
+          <a href="#qr-attendance"><span>03</span><strong>QR Attendance</strong><span>Web application</span><ArrowDownRight aria-hidden="true" size={20} /></a>
+        </nav>
+      </div>
+
+      <article id="ayos" className="ayos-project" aria-labelledby="ayos-heading">
+        <header className="project-header page-width">
+          <ProjectMeta index={0} />
+          <div className="project-heading-row"><h3 id="ayos-heading" className="project-title">AyOS</h3><div><p className="project-subtitle">Personal Productivity OS</p><p className="project-summary">{ayos.description}</p></div></div>
+          <p className="technology-line">{ayos.technologies.join(" · ")}</p>
+        </header>
+
+        <div className="ayos-scene">
+          <div className="ayos-stage">
+            {ayosScreens.map((screen, index) => <figure className="ayos-screen" key={screen.file}>
+              <Image src={`/projects/ayos/${screen.file}.png`} alt={`AyOS ${screen.title} screen — ${screen.detail}`} width={screen.width} height={screen.height} sizes="(max-width: 899px) 100vw, 85vw" />
+              <figcaption><span><strong>{screen.title}</strong><span>{screen.detail}</span></span><span className="ayos-count">0{index + 1} / 0{ayosScreens.length}</span></figcaption>
+            </figure>)}
           </div>
-          <p className="max-w-sm text-sm leading-relaxed text-muted-foreground lg:col-span-4 lg:col-start-9">
-            LINIS is the main case study: a computer engineering thesis that turns a physical waste stream into a readable operational signal.
-          </p>
         </div>
-
-        <article className="grid gap-10 py-12 lg:grid-cols-12 lg:gap-8 lg:py-16">
-          <div className="self-start lg:sticky lg:top-28 lg:col-span-4">
-            <div className="flex items-center justify-between border-t border-accent pt-3 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-              <span>Thesis / 2025—26</span>
-            </div>
-            <p aria-hidden="true" className="mt-6 text-8xl font-light leading-none tracking-[-0.08em] text-muted-foreground">01</p>
-            <h3 className="mt-8 max-w-sm text-4xl font-semibold leading-[0.92] tracking-[-0.06em] text-foreground sm:text-5xl">
-              {project.title.replace(" – Smart Bin Monitoring System", "")}
-            </h3>
-            <p className="mt-6 max-w-sm text-base leading-relaxed text-muted-foreground">
-              {project.description}
-            </p>
-            <div className="mt-8 border-t border-border pt-4">
-              <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Role / Systems architecture, application, edge integration</p>
-              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Stack / React Native · Raspberry Pi · Python · Firebase</p>
-            </div>
-          </div>
-
-          <div className="lg:col-span-7 lg:col-start-6">
-            <figure className="project-media">
-              <div className="flex min-h-[28rem] items-center justify-center bg-surface-strong p-5 sm:min-h-[46rem]">
-                <Image
-                  src={project.image}
-                  alt="LINIS mobile monitoring dashboard"
-                  width={159}
-                  height={346}
-                  className="h-auto max-h-[36rem] w-64 max-w-full object-contain"
-                  sizes="(max-width: 1024px) 90vw, 55vw"
-                />
+        <div className="page-width">
+            <figure className="ayos-architecture section-light" aria-labelledby="ayos-architecture-caption">
+              <figcaption id="ayos-architecture-caption">Application architecture <ArrowDownRight aria-hidden="true" size={22} /></figcaption>
+              <p className="architecture-statement">One desktop.<br />One local system.</p>
+              <div className="architecture-stack">
+                <div className="architecture-layer"><span>Interface</span><strong>React <span>+ TypeScript</span></strong><p>Productivity, finance, fitness, and calendar</p></div>
+                <div className="architecture-layer"><span>Native application</span><strong>Rust <span>+ Tauri</span></strong><p>Validation, backups, and native operations</p></div>
+                <div className="architecture-layer"><span>Persistence</span><strong>SQLite</strong><p>Embedded storage, available offline</p></div>
               </div>
-              <figcaption className="flex flex-wrap justify-between gap-3 border-t border-border pt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
-                <span>LINIS / Monitoring overview</span>
-                <span>Mobile interface</span>
-              </figcaption>
+              <p className="architecture-connection">Authenticated localhost API <span aria-hidden="true">↔</span> n8n automation</p>
             </figure>
-          </div>
-        </article>
-
-        <div className="grid gap-10 border-t border-border pt-10 lg:grid-cols-12 lg:gap-8">
-          <div className="lg:col-span-4">
-            <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">The engineering question</p>
-            <h3 className="mt-5 max-w-xs text-3xl font-semibold leading-[0.95] tracking-[-0.05em] text-foreground sm:text-4xl">
-              When does a shared bin become an operational problem?
-            </h3>
-          </div>
-          <div className="lg:col-span-7 lg:col-start-6">
-            <p className="max-w-2xl text-lg leading-relaxed text-foreground sm:text-xl">
-              {project.problemSolved}
-            </p>
-
-            <ol className="mt-10 border-y border-border">
-              {pipeline.map(([number, title, detail]) => (
-                <li key={number} className="grid gap-3 border-b border-border py-5 last:border-b-0 sm:grid-cols-[3.5rem_8rem_1fr] sm:items-start">
-                  <span className="font-mono text-xs text-accent">{number}</span>
-                  <h4 className="text-sm font-medium uppercase tracking-[0.08em] text-foreground">{title}</h4>
-                  <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{detail}</p>
-                </li>
-              ))}
-            </ol>
-          </div>
         </div>
+        <div className="project-afterword page-width"><p className="eyebrow">Built and shipped</p><p>A React interface with Rust handling validation, persistence, backups, and native operations. Packaged as a production Windows installer, with n8n workflows connected through an authenticated localhost API.</p></div>
+      </article>
 
-        <div className="mt-16 grid gap-10 border-t border-border pt-10 sm:grid-cols-3 sm:items-start">
-          {[
-            ["/projects/linis-app-1.png", "Monitoring overview"],
-            ["/projects/linis-app-2.png", "Bin-level status"],
-            ["/projects/linis-app-3.png", "Notification log"],
-          ].map(([src, alt], index) => (
-            <figure key={src} className={`project-media ${index === 1 ? "sm:mt-20" : index === 2 ? "sm:mt-40" : ""}`}>
-              <div className="flex h-96 items-center justify-center bg-surface-strong p-6">
-                <Image src={src} alt={alt} width={178} height={367} className="h-full w-auto object-contain" sizes="(max-width: 640px) 90vw, 30vw" />
+      <article id="linis" className="linis-project section-light" aria-labelledby="linis-heading">
+        <header className="project-header page-width">
+          <ProjectMeta index={1} />
+          <div className="project-heading-row"><h3 id="linis-heading" className="project-title">LINIS</h3><div><p className="project-subtitle">IoT System for Bin Time-to-Overflow Forecasting and Priority Collection</p><p className="project-summary">{linis.description}</p></div></div>
+          <p className="technology-line">{linis.technologies.join(" · ")}</p>
+        </header>
+        <div className="linis-scene">
+          <div className="linis-stage">
+            <div className="linis-stage-top"><span>From the physical world to the interface</span><span>LINIS</span></div>
+            <div className="linis-composition">
+              <figure className="linis-anchor">
+                <div className="linis-image-frame"><Image src={linis.image} alt="LINIS Android application showing bin monitoring information" width={159} height={346} sizes="(max-width: 900px) 60vw, 28vw" className="linis-image" /></div>
+                <figcaption>Android monitoring application</figcaption>
+              </figure>
+              <div className="linis-explanation">
+                <LinisSystem />
+                <ol className="linis-steps" aria-label="LINIS system layers">
+                  {linisLayers.map((layer, index) => <li className="linis-step" key={layer.name}><span className="step-number">0{index + 1}</span><div><h4>{layer.name}</h4><p className="layer-tech">{layer.technology}</p><p className="layer-detail">{layer.detail}</p></div></li>)}
+                </ol>
               </div>
-              <figcaption className="pt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground">{alt}</figcaption>
-            </figure>
-          ))}
+            </div>
+            <div className="linis-track" aria-hidden="true"><span /></div>
+          </div>
         </div>
+        <div className="linis-detail page-width">
+          <div><p className="eyebrow">A connected view</p><h4 className="section-heading">Physical inputs.<br />Useful information.</h4></div>
+          <div className="linis-gallery">
+            <figure><Image src="/projects/linis-app-2.png" alt="LINIS bin detail screen" width={162} height={338} sizes="(max-width: 600px) 40vw, 20vw" /><figcaption>Bin detail</figcaption></figure>
+            <figure><Image src="/projects/linis-app-3.png" alt="LINIS notification history" width={178} height={367} sizes="(max-width: 600px) 40vw, 20vw" /><figcaption>Notification history</figcaption></figure>
+          </div>
+        </div>
+      </article>
 
-        <div className="mt-10 flex flex-wrap items-center gap-5 border-t border-border pt-6">
-          <Button href={`mailto:${personalInfo.email}?subject=${encodeURIComponent("LINIS project walkthrough")}`} variant="primary" size="md" rightIcon={<ArrowUpRight className="h-4 w-4" />}>
-            Request a walkthrough
-          </Button>
-          <span className="inline-flex items-center gap-2 text-sm text-muted-foreground"><Lock className="h-4 w-4 text-accent" /> Private thesis code</span>
+      <article id="qr-attendance" className="attendance-project section-space" aria-labelledby="attendance-heading">
+        <div className="page-width">
+          <ProjectMeta index={2} />
+          <div className="attendance-heading-row"><h3 id="attendance-heading" className="section-heading">QR Attendance<br /><span className="quiet-title">& Allowances</span></h3><div><p className="project-summary">{attendance.description}</p><p className="technology-line">{attendance.technologies.join(" · ")}</p></div></div>
+          <ol className="attendance-flow" aria-label="Attendance and allowance workflow">
+            <li><span className="flow-number">01</span><h4>Create an event</h4><p>Define the event and its allowance amount.</p></li>
+            <li><span className="flow-number">02</span><h4>Verify attendance</h4><p>Record attendance through the QR-based workflow.</p></li>
+            <li><span className="flow-number">03</span><h4>Credit allowance</h4><p>Automatically credit eligible users after verification.</p></li>
+          </ol>
+          <div className="attendance-roles"><p>Role-based dashboards</p><ul><li>Admins</li><li>Workers</li><li>Attendees</li></ul></div>
+          <div className="attendance-notes"><p>Role-based dashboards for admins, workers, and attendees bring events, history, announcements, and allowances together.</p><p>Core workflows validated through unit, integration, user acceptance, and performance testing.</p></div>
+          <a className="text-link project-inquiry" href={`mailto:${personalInfo.email}?subject=Project%20walkthrough`}>Talk through the projects <ArrowUpRight aria-hidden="true" size={18} /></a>
         </div>
-      </Container>
+      </article>
     </section>
   );
-};
+}

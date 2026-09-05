@@ -1,11 +1,6 @@
-import React from "react";
-import { SystemErrorGame } from "@/components/game/SystemErrorGame";
+import { redirect } from "next/navigation";
 
-export const metadata = {
-  title: "SYSTEM//ERROR — Indie Mini Game | Clayde Arnaiz",
-  description: "Top-down exploratory hacker mini-game embedded in Clayde Arnaiz's engineering portfolio.",
-};
-
+// The portfolio no longer exposes the former themed game experience.
 export default function GamePage() {
-  return <SystemErrorGame />;
+  redirect("/#projects");
 }

@@ -445,7 +445,7 @@ export const SystemErrorGame: React.FC = () => {
               {activePanel.type === "node_skills" && (
                 <div className="space-y-3">
                   <h2 className="text-xl font-bold text-white uppercase">SKILLS DATABASE</h2>
-                  <div className="flex flex-wrap gap-1.5">{skillsData.map((s) => (<span key={s.name} className="px-2 py-1 rounded bg-neutral-900 text-xs border border-neutral-800">{s.name} ({s.level}%)</span>))}</div>
+                  <div className="flex flex-wrap gap-1.5">{skillsData.map((s) => (<span key={s.name} className="px-2 py-1 text-xs">{s.name}</span>))}</div>
                   <button type="button" onClick={() => router.push("/#skills")} className="mt-4 px-4 py-2 bg-white text-black font-bold rounded-lg text-xs">OPEN FULL SKILLS SECTION</button>
                 </div>
               )}

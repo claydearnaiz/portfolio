@@ -15,18 +15,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    if (savedTheme === "light" || savedTheme === "dark") {
-      setTheme(savedTheme);
-      document.documentElement.classList.toggle("light", savedTheme === "light");
-      document.documentElement.classList.toggle("dark", savedTheme === "dark");
-    }
+    setTheme(document.documentElement.classList.contains("light") ? "light" : "dark");
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
+    const newTheme = document.documentElement.classList.contains("dark") ? "light" : "dark";
     setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
+    try { localStorage.setItem("portfolio-theme", newTheme); } catch { /* Theme still works when storage is unavailable. */ }
     document.documentElement.classList.toggle("light", newTheme === "light");
     document.documentElement.classList.toggle("dark", newTheme === "dark");
   };

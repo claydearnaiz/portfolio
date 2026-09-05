@@ -3,6 +3,8 @@ export type ProjectCategory = "All" | "Mobile Development" | "Web Development" |
 export interface Project {
   id: string;
   title: string;
+  year: string;
+  kind: string;
   description: string;
   problemSolved?: string;
   category: "Mobile Development" | "Web Development" | "IoT & Embedded" | "Other";
@@ -14,16 +16,12 @@ export interface Project {
   featured: boolean;
 }
 
-export type SkillCategory = "Frontend" | "Backend" | "IoT & AI" | "Tools";
-
-export type ProficiencyLevel = "Proficient" | "Familiar" | "Learning";
+export type SkillCategory = "Languages" | "Frameworks / Tools" | "IT / Cloud" | "Hardware / IoT";
 
 export interface Skill {
   name: string;
   category: SkillCategory;
   iconName: string;
-  proficiency: ProficiencyLevel;
-  level?: number;
 }
 
 export interface ExperienceItem {
