@@ -41,6 +41,10 @@ public/models/
 *.MD
 
 # OS & IDE
+# local agent tooling
+/.agents/
+/.codex/
+
 .DS_Store
 *.pem
 Thumbs.db
