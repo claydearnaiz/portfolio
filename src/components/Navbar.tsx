@@ -61,7 +61,7 @@ export function Navbar() {
     requestAnimationFrame(() => {
       const target = document.getElementById(href.slice(1));
       if (!target) return;
-      history.pushState(null, "", href);
+      history.pushState(null, "", href === "#hero" ? location.pathname + location.search : href);
       target.setAttribute("tabindex", "-1");
       target.focus({ preventScroll: true });
       target.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });

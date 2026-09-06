@@ -33,7 +33,10 @@ export function PortfolioMotion({ children }: { children: React.ReactNode }) {
       let id = "";
       try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
       requestAnimationFrame(() => {
-        if (!disposed && id) document.getElementById(id)?.scrollIntoView({ behavior: "instant" });
+        if (!disposed && id) {
+          document.getElementById(id)?.scrollIntoView({ behavior: "instant" });
+          if (id === "hero") history.replaceState(history.state, "", location.pathname + location.search);
+        }
       });
     };
     window.addEventListener("hashchange", positionHash);
@@ -129,6 +132,7 @@ export function PortfolioMotion({ children }: { children: React.ReactNode }) {
         let id = "";
         try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
         document.getElementById(id)?.scrollIntoView({ behavior: "instant" });
+        if (id === "hero") history.replaceState(history.state, "", location.pathname + location.search);
       }
     });
     if (restorePosition.current !== null) {
