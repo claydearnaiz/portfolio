@@ -45,5 +45,5 @@ export const linisLayers = [
   { name: "See", technology: "Raspberry Pi · YOLOv8n", detail: "Head detection counts people within a defined region of interest. NCNN brings the model to the edge." },
   { name: "Synchronize", technology: "Firebase", detail: "Sensor and camera data stay synchronized in real time." },
   { name: "Forecast", technology: "Python · Random Forest", detail: "A Random Forest model uses the data to forecast bin fill levels." },
-  { name: "Read", technology: "React Native · Android", detail: "The application brings the connected system into a readable monitoring interface." },
+  { name: "Monitor / act", technology: "React Native · Android", detail: "The application brings the connected system into a readable monitoring interface." },
 ];

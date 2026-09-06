@@ -49,6 +49,7 @@ export function PortfolioMotion({ children }: { children: React.ReactNode }) {
         trigger: select(".identity-scene")[0], start: "top top", end: "bottom bottom", scrub: true, invalidateOnRefresh: true,
       }});
       hero.to(select(".hero-name"), { scale: 2.4, xPercent: -10, yPercent: -8, duration: 0.75 }, 0.08)
+        .to(select(".hero-art"), { scale: 1.05, y: -24, duration: 0.85 }, 0)
         .to(select(".hero-support"), { y: -60, xPercent: 130, opacity: 0, duration: 0.25 }, 0.08)
         .fromTo(select(".hero-plane"), { scaleX: 0.06, scaleY: 0.006 }, { scaleX: 1, scaleY: 1, duration: 0.62, ease: "power2.inOut" }, 0.3);
 
@@ -90,14 +91,14 @@ export function PortfolioMotion({ children }: { children: React.ReactNode }) {
       const linis = gsap.timeline({ defaults: { ease: "none" }, scrollTrigger: {
         trigger: select(".linis-scene")[0], start: "top top", end: "bottom bottom", scrub: true, invalidateOnRefresh: true,
       }});
-      linis.fromTo(select(".linis-image-frame"), { scale: 0.92 }, { scale: 1, duration: 0.65 }, 0)
+      linis.fromTo(select(".linis-image-frame"), { scale: 0.82 }, { scale: 1, duration: 5.4 }, 0)
         .fromTo(select(".linis-track span"), { scaleX: 0 }, { scaleX: 1, duration: 5.8 }, 0);
       steps.forEach((step, index) => {
-        const time = index + 0.65;
-        linis.fromTo(step, { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2 }, time)
+        const time = index;
+        linis.fromTo(step, { y: index === 0 ? 0 : 16, opacity: index === 0 ? 1 : 0 }, { y: 0, opacity: 1, duration: 0.2 }, time)
           .fromTo(nodes[index], { "--node-emphasis": "0%" }, { "--node-emphasis": "100%", duration: 0.2 }, time);
         if (index < steps.length - 1) {
-          linis.to(step, { y: -12, opacity: 0, duration: 0.18 }, time + 0.78)
+          linis.to(step, { y: -12, opacity: 0, duration: 0.2 }, time + 0.9)
             .to(nodes[index], { "--node-emphasis": "0%", duration: 0.18 }, time + 0.78);
         }
       });

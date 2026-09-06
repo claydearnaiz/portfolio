@@ -75,9 +75,11 @@ export function Navbar() {
         <nav className="desktop-nav" aria-label="Primary navigation">
           {navItems.map(item => <a key={item.href} href={item.href} aria-current={active === item.href ? "location" : undefined}>{item.label}</a>)}
         </nav>
+        <div className="nav-actions">
         <a className="nav-resume" href="/resume.pdf" target="_blank" rel="noopener noreferrer">Résumé <ArrowUpRight aria-hidden="true" size={16} /></a>
-        <button ref={themeToggle} className="theme-toggle" type="button" onClick={toggleTheme} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>{theme === "dark" ? <Sun aria-hidden="true" size={17} /> : <Moon aria-hidden="true" size={17} />}<span>{theme === "dark" ? "Light" : "Dark"}</span></button>
+        <button ref={themeToggle} className="theme-toggle" type="button" onClick={toggleTheme} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}>{theme === "dark" ? <Sun aria-hidden="true" size={18} /> : <Moon aria-hidden="true" size={18} />}</button>
         <button ref={toggle} className="menu-toggle" type="button" onClick={() => setOpen(value => !value)} aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="mobile-navigation">{open ? <X aria-hidden="true" size={22} /> : <Menu aria-hidden="true" size={22} />}</button>
+        </div>
       </div>
       {open && <div ref={menu} className="mobile-nav" id="mobile-navigation"><nav aria-label="Mobile navigation">{navItems.map(item => <a key={item.href} href={item.href} onClick={event => followAnchor(event, item.href)}>{item.label}</a>)}<a href="/resume.pdf" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>Résumé ↗</a></nav></div>}
     </header>
